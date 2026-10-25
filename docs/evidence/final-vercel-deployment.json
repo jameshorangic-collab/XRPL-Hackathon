@@ -1,0 +1,93 @@
+{
+  "verifiedAtUTC": "2026-10-25T16:31:45.338905+00:00",
+  "url": "https://backstop-xrpl.vercel.app",
+  "deploymentId": "dpl_5PGF7QGqbwPGqJBdDHhLximwZ8pB",
+  "sourceCommit": "20b988b699ff39a2913067fed1a3d553c42e57b6",
+  "method": "Authenticated Vercel CLI production deployment to existing project",
+  "gitAutoDeploy": false,
+  "liveSponsorExecution": "Verified locally; remote credentials, database and worker remain unconfigured",
+  "checks": [
+    {
+      "path": "/signup",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 373,
+      "sha256": "fa0ca4b19a1de663b94d70ed7e23bc50518c564c2bcd621fc6f186858bc149c5"
+    },
+    {
+      "path": "/borrow",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 373,
+      "sha256": "fa0ca4b19a1de663b94d70ed7e23bc50518c564c2bcd621fc6f186858bc149c5"
+    },
+    {
+      "path": "/invest",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 373,
+      "sha256": "fa0ca4b19a1de663b94d70ed7e23bc50518c564c2bcd621fc6f186858bc149c5"
+    },
+    {
+      "path": "/dashboard",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 373,
+      "sha256": "fa0ca4b19a1de663b94d70ed7e23bc50518c564c2bcd621fc6f186858bc149c5"
+    },
+    {
+      "path": "/api/health",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 89,
+      "sha256": "006d8775ba615dd57908c6f5a57aedb828d1341c5425db6732b977c42cd02472",
+      "body": {
+        "ok": true,
+        "version": "0.3.0",
+        "storage": "not-configured",
+        "mode": "synthetic-business-data"
+      }
+    },
+    {
+      "path": "/api/integrations/status",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 494,
+      "sha256": "466a008c69ef6242f90a019f52a90392905d1e1824209d0a68077ec01a420419",
+      "body": {
+        "services": [
+          {
+            "id": "aws",
+            "status": "Demo mode",
+            "detail": "No AWS agent configured; deterministic demo rules."
+          },
+          {
+            "id": "ap4m",
+            "status": "Not configured",
+            "detail": "No live AP4M worker/signing session. Synthetic report is available; no payment is claimed."
+          },
+          {
+            "id": "quicknode",
+            "status": "Not configured",
+            "detail": "No QuickNode endpoint configured."
+          },
+          {
+            "id": "xrpl",
+            "status": "Demo mode",
+            "detail": "No verified testnet RPC; simulated commitments remain available."
+          }
+        ],
+        "database": "Not configured",
+        "chain": null
+      }
+    }
+  ],
+  "browserChecks": [
+    "public synthetic borrower signup",
+    "Load Demo Bakery -> submit -> explicit deterministic fallback",
+    "refresh retained application and assessment",
+    "role switch to investor",
+    "five-business bakery portfolio feasible at 35000 senior /8000 mezzanine /5000 junior /2000 retention",
+    "funding progress zero before commitments"
+  ]
+}

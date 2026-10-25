@@ -30,3 +30,7 @@ The full credentialed integration is verified locally at http://127.0.0.1:3001. 
 No unresolved blocking failure remains in exercised local flows. QuickNode's five-block log limit is handled. Payout may settle after redemption and requires evidence refresh; no second charge occurs. Development hot reload can interrupt wallet prompts: use the stable compiled preview. A crashed SDK worker may leave a lock file; verify it is not running before removing only the lock. Never delete payment SQLite or signed intent state. AWS default Anthropic onboarding remains incomplete; the verified Nova model override is explicit.
 
 No new paid cloud resource, mainnet transaction, MetaMask key export, or unrelated product feature was introduced. Remaining priority for fully hosted live judging is durable backend/worker configuration; see INTEGRATIONS.md.
+
+## Final deployment verification
+
+The existing Vercel production alias was updated from source commit `20b988b`. All four pages and health/status API endpoints returned HTTP 200 without authentication; the public fallback bakery/investor browser flow passed. Live credentialed sponsor operations remain local-only until remote storage, credentials and persistent worker configuration are supplied. Exact deployment evidence and limitations are in DEPLOYMENT.md.
