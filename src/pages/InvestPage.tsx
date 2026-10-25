@@ -74,8 +74,9 @@ export default function InvestPage() {
                     {l.status === "open" ? "Open" : `Simulated ${l.status}`}
                   </Badge>
                 </div>
-                <p className="small muted">
-                  {l.loan.sector} · {l.loan.grade}
+                <p className="card-meta">
+                  {l.loan.sector}
+                  <span className="grade">Grade {l.loan.grade}</span>
                 </p>
                 <div className="detail-grid">
                   <p>
@@ -88,19 +89,21 @@ export default function InvestPage() {
                   </p>
                   <p>
                     <span>Indicative coupon cap</span>
-                    <strong>{percent(l.loan.couponBps)}</strong>
+                    <strong>{percent(l.loan.couponBps)} / yr</strong>
                   </p>
                   <p>
                     <span>Position</span>
                     <strong>Whole loan</strong>
                   </p>
                 </div>
-                <p className="small">{l.recommendation}</p>
+                <p className="risk-summary">
+                  <span>Risk summary</span>
+                  {l.recommendation} Assumed default probability{" "}
+                  {percent(l.loan.pdBps)} / yr (synthetic).
+                </p>
                 <FundingProgress state={state} id={l.id} />
                 <button className="primary" onClick={() => setSelected(l.id)}>
-                  {l.status === "open"
-                    ? "View / Invest"
-                    : "View funding details"}
+                  {l.status === "open" ? "View & bid" : "View funding details"}
                 </button>
               </article>
             ))
@@ -143,12 +146,17 @@ export default function InvestPage() {
                 </p>
               </div>
               <p className="small muted">
-                {new Set(p.terms.loans.map((l) => l.sector)).size} industries ·
-                12-month bullet model · Senior / Mezzanine / Junior
+                {new Set(p.terms.loans.map((l) => l.sector)).size} industries ·{" "}
+                {p.terms.termMonths}-month bullet model
               </p>
+              <div className="tranche-chips" aria-label="Available positions">
+                <span className="senior">Senior</span>
+                <span className="mezzanine">Mezzanine</span>
+                <span className="junior">Junior</span>
+              </div>
               <FundingProgress state={state} id={p.id} />
               <button className="primary" onClick={() => setSelected(p.id)}>
-                View / Invest
+                Choose tranche & bid
               </button>
             </article>
           ))

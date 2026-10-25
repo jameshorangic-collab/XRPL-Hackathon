@@ -3,7 +3,7 @@ import { Badge } from "./ui";
 export default function IntegrationPanel() {
   const { statuses, refreshStatuses, action, busy, base } = useApp();
   return (
-    <section className="panel">
+    <section className="panel integrations">
       <div className="section-heading">
         <h2>Integration status</h2>
         <button
@@ -15,43 +15,31 @@ export default function IntegrationPanel() {
           Refresh status
         </button>
       </div>
-      <div className="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>Service</th>
-              <th>Purpose</th>
-              <th>Status</th>
-              <th>Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            {statuses.map((s) => (
-              <tr key={s.id}>
-                <td>
-                  <a href={s.docs} target="_blank" rel="noreferrer">
-                    {s.name} ↗
-                  </a>
-                </td>
-                <td>{s.purpose}</td>
-                <td>
-                  <Badge
-                    tone={
-                      s.status === "Connected"
-                        ? "good"
-                        : s.status === "Error"
-                          ? "bad"
-                          : "neutral"
-                    }
-                  >
-                    {s.status}
-                  </Badge>
-                </td>
-                <td>{s.detail}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="integration-grid">
+        {statuses.map((s) => {
+          const tone =
+            s.status === "Connected"
+              ? "good"
+              : s.status === "Error"
+                ? "bad"
+                : s.status === "Demo mode"
+                  ? "warning"
+                  : "neutral";
+          return (
+            <div className={`integration-card ${tone}`} key={s.id}>
+              <div className="integration-head">
+                <span className="status-dot" aria-hidden="true" />
+                <strong>{s.name}</strong>
+                <Badge tone={tone}>{s.status}</Badge>
+              </div>
+              <p className="small muted">{s.purpose}</p>
+              <p className="small">{s.detail}</p>
+              <a href={s.docs} target="_blank" rel="noreferrer">
+                Docs ↗
+              </a>
+            </div>
+          );
+        })}
       </div>
       {base ? (
         <p className="small">

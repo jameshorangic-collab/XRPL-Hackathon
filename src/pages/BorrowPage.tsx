@@ -73,34 +73,37 @@ export default function BorrowPage() {
             </button>
           </div>
           <form onSubmit={submit}>
-            <label>
-              Business name
-              <input
-                value={form.businessName}
-                onChange={(e) => field("businessName", e.target.value)}
-                maxLength={100}
-                required
-              />
-            </label>
-            <label>
-              Business category
-              <select
-                value={form.category}
-                onChange={(e) => field("category", e.target.value)}
-              >
-                {[
-                  "Services",
-                  "Healthcare",
-                  "Manufacturing",
-                  "Logistics",
-                  "Retail",
-                  "Wholesale",
-                  "Food & beverage",
-                ].map((s) => (
-                  <option key={s}>{s}</option>
-                ))}
-              </select>
-            </label>
+            <h3 className="form-section">Business details</h3>
+            <div className="form-row">
+              <label>
+                Business name
+                <input
+                  value={form.businessName}
+                  onChange={(e) => field("businessName", e.target.value)}
+                  maxLength={100}
+                  required
+                />
+              </label>
+              <label>
+                Industry
+                <select
+                  value={form.category}
+                  onChange={(e) => field("category", e.target.value)}
+                >
+                  {[
+                    "Services",
+                    "Healthcare",
+                    "Manufacturing",
+                    "Logistics",
+                    "Retail",
+                    "Wholesale",
+                    "Food & beverage",
+                  ].map((s) => (
+                    <option key={s}>{s}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
             <label>
               Business description
               <textarea
@@ -112,6 +115,21 @@ export default function BorrowPage() {
                 rows={3}
               />
             </label>
+            <div className="form-row">
+              <label>
+                Years in operation
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  step="0.1"
+                  value={form.yearsOperating}
+                  onChange={(e) => field("yearsOperating", e.target.value)}
+                  required
+                />
+              </label>
+            </div>
+            <h3 className="form-section">Loan details</h3>
             <div className="form-row">
               <label>
                 Requested loan amount ($)
@@ -149,6 +167,7 @@ export default function BorrowPage() {
                 required
               />
             </label>
+            <h3 className="form-section">Financial information</h3>
             <div className="form-row">
               <label>
                 Average monthly revenue ($)
@@ -188,18 +207,16 @@ export default function BorrowPage() {
                   required
                 />
               </label>
-              <label>
-                Years in operation
-                <input
-                  type="number"
-                  min={0}
-                  max={100}
-                  step="0.1"
-                  value={form.yearsOperating}
-                  onChange={(e) => field("yearsOperating", e.target.value)}
-                  required
-                />
-              </label>
+              <div className="cash-preview" aria-live="polite">
+                <span>Monthly cash after expenses &amp; debt</span>
+                <strong>
+                  {money(
+                    form.monthlyRevenue -
+                      form.monthlyExpenses -
+                      form.monthlyDebt,
+                  )}
+                </strong>
+              </div>
             </div>
             <label>
               Additional financial notes
@@ -216,12 +233,12 @@ export default function BorrowPage() {
               assessment needing review is not automatically listed.
             </p>
             <button
-              className="primary"
+              className="primary large"
               disabled={
                 busy || state.users[state.currentUserId!].role !== "borrower"
               }
             >
-              {busy ? "Processing…" : "Submit for Underwriting"}
+              {busy ? "Submitting…" : "Submit for Underwriting"}
             </button>
           </form>
         </section>
@@ -231,16 +248,34 @@ export default function BorrowPage() {
           ) : (
             <section className="panel">
               <h2>What happens next</h2>
-              <ol className="simple-list">
-                <li>Your application and job are saved in this browser.</li>
-                <li>
-                  Deterministic rules calculate cash availability and ratios.
-                </li>
-                <li>Eligible loans appear in the investor marketplace.</li>
-                <li>
-                  Applications needing review wait for explicit demo-operator
-                  approval.
-                </li>
+              <ol className="timeline preview">
+                {[
+                  ["Application submitted", "Saved in this browser."],
+                  [
+                    "Financial analysis",
+                    "Cash availability and ratios calculated.",
+                  ],
+                  [
+                    "Additional verification",
+                    "Paid credit data only if AP4M is connected.",
+                  ],
+                  [
+                    "Underwriting assessment",
+                    "Risk factors, gaps, and a preliminary recommendation.",
+                  ],
+                  [
+                    "Marketplace eligibility",
+                    "Eligible requests are listed for investor bids.",
+                  ],
+                ].map(([t, d], i) => (
+                  <li key={t}>
+                    <span className="step-number">{i + 1}</span>
+                    <div>
+                      <strong>{t}</strong>
+                      <p>{d}</p>
+                    </div>
+                  </li>
+                ))}
               </ol>
               <p className="callout">
                 AWS and paid credit data are optional. No AI invocation or
