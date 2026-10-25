@@ -1,6 +1,6 @@
 # Integration implementation
 
-The existing Vite/React frontend and four routes are preserved. `server/app.ts` implements the API; `server/index.ts` serves a stable full-stack local production preview. `api/[...path].ts` adapts the same handler to Vercel. Browser profiles and investor capital remain local simulations; real applications, jobs, reports, payment operations and evidence are persisted separately.
+The existing Vite/React frontend and four routes are preserved. `server/app.ts` implements the API; `server/index.ts` serves a stable full-stack local production preview. `api/index.js (generated from server/vercel.ts)` adapts the same handler to Vercel. Browser profiles and investor capital remain local simulations; real applications, jobs, reports, payment operations and evidence are persisted separately.
 
 ## AWS
 

@@ -3,7 +3,7 @@ import tseslint from "typescript-eslint";
 import reactHooks from "eslint-plugin-react-hooks";
 import globals from "globals";
 export default tseslint.config(
-  { ignores: ["dist/**", "artifacts/**", "cache/**", "coverage/**", "server/vendor/**", ".backstop/**"] },
+  { ignores: ["dist/**", "artifacts/**", "cache/**", "coverage/**", "server/vendor/**", "api/index.js", ".backstop/**"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   { files: ["scripts/**/*.mjs", "server/**/*.ts", "server/**/*.mjs", "api/**/*.ts", "scripts/**/*.ts"], languageOptions: { globals: globals.node } },

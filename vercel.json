@@ -4,9 +4,25 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/signup", "destination": "/index.html" },
-    { "source": "/borrow", "destination": "/index.html" },
-    { "source": "/invest", "destination": "/index.html" },
-    { "source": "/dashboard", "destination": "/index.html" }
+    {
+      "source": "/api/:path*",
+      "destination": "/api/index?route=:path*"
+    },
+    {
+      "source": "/signup",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/borrow",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/invest",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/index.html"
+    }
   ]
 }

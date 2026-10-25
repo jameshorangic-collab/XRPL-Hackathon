@@ -23,7 +23,7 @@ The full credentialed integration is verified locally at http://127.0.0.1:3001. 
 
 ## Relevant implementation
 
-`server/`: config/auth, libSQL store, AWS invocation, RPC verification, API dispatch, stable local host, official-SDK AP4M worker and regression tests. `api/[...path].ts`: Vercel adapter. `src/data/bakeryDemo.ts` and `src/domain/cashflowReport.ts`: synthetic scenario and deterministic report comparison. Existing frontend changes only connect data, payment authorization/evidence and demo buttons. Original contracts and financial clearing engine remain intact.
+`server/`: config/auth, libSQL store, AWS invocation, RPC verification, API dispatch, stable local host, official-SDK AP4M worker and regression tests. `api/index.js (generated from server/vercel.ts)`: Vercel adapter. `src/data/bakeryDemo.ts` and `src/domain/cashflowReport.ts`: synthetic scenario and deterministic report comparison. Existing frontend changes only connect data, payment authorization/evidence and demo buttons. Original contracts and financial clearing engine remain intact.
 
 ## Known issues and recovery
 
