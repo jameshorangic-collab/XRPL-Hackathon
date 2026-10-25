@@ -3,10 +3,11 @@
   --surface: rgb(255 253 248 / 82%);
   --surface-solid: #fffdf8;
   --surface-2: rgb(250 246 238 / 85%);
-  --ink: #14213d;
-  --ink-2: #33405c;
-  --muted: #5d6478;
-  --faint: #8d93a3;
+  --ink: #3f4757;
+  --ink-2: #555d6e;
+  --muted: #7a8191;
+  --faint: #9ea4b1;
+  --heading: #14213d;
   --border: rgb(20 33 61 / 11%);
   --border-strong: rgb(20 33 61 / 20%);
   --accent: #14264a;
@@ -208,7 +209,7 @@ button {
   color: var(--accent);
   padding: 8px 14px;
   font-size: 13px;
-  font-weight: 550;
+  font-weight: 400;
   cursor: pointer;
   line-height: 1.4;
   min-height: 38px;
@@ -260,7 +261,7 @@ button.block {
   min-height: 0;
   padding: 0;
   color: var(--accent-2);
-  font-weight: 550;
+  font-weight: 400;
   text-align: left;
   box-shadow: none;
 }
@@ -352,7 +353,7 @@ input[type="range"] {
 label {
   font-size: 13px;
   color: var(--ink-2);
-  font-weight: 550;
+  font-weight: 400;
   display: flex;
   flex-direction: column;
   gap: 7px;
@@ -375,7 +376,7 @@ fieldset {
 legend {
   font-size: 13px;
   color: var(--ink-2);
-  font-weight: 550;
+  font-weight: 400;
   margin-bottom: 10px;
   padding: 0;
 }
@@ -471,7 +472,7 @@ form > .form-section:first-child {
   text-decoration: none;
   color: var(--muted);
   font-size: 14px;
-  font-weight: 550;
+  font-weight: 400;
   padding: 0 14px;
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
@@ -612,7 +613,7 @@ main {
   padding: 3px 10px;
   white-space: nowrap;
   max-width: 100%;
-  font-weight: 550;
+  font-weight: 400;
   line-height: 1.4;
 }
 .badge::before {
@@ -1117,7 +1118,7 @@ dd {
 }
 .tranche-chips span {
   font-size: 12px;
-  font-weight: 550;
+  font-weight: 400;
   padding: 2px 9px 2px 8px;
   border-radius: 5px;
   background: var(--surface-2);
@@ -1233,7 +1234,7 @@ dd {
   color: var(--accent);
   background: var(--accent-tint);
   border-color: rgb(20 33 61 / 14%);
-  font-weight: 550;
+  font-weight: 400;
 }
 .progress-strip li.done span {
   background: var(--accent);
@@ -1435,7 +1436,7 @@ th {
   background: var(--surface-2);
   color: var(--muted);
   font-size: 12px;
-  font-weight: 550;
+  font-weight: 400;
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
 }
@@ -1488,7 +1489,7 @@ details {
 }
 summary {
   font-size: 14px;
-  font-weight: 550;
+  font-weight: 400;
   cursor: pointer;
   color: var(--ink-2);
   line-height: 1.6;
@@ -1993,7 +1994,7 @@ footer {
 /* Darker, higher-contrast tabs */
 .app-header nav a {
   color: var(--ink-2);
-  font-weight: 550;
+  font-weight: 400;
 }
 .app-header nav a:hover {
   color: var(--accent);
@@ -2011,7 +2012,7 @@ footer {
 .role-switch button,
 .tabs button {
   color: var(--ink-2);
-  font-weight: 550;
+  font-weight: 400;
 }
 .tabs span {
   background: rgb(20 38 74 / 12%);
@@ -2025,4 +2026,17 @@ svg.brand-mark {
   border-radius: 0;
   box-shadow: none;
   flex-shrink: 0;
+}
+
+/* Serif headings stay navy; Arial body text uses the softer grey ink */
+h1,
+h2,
+h3,
+.brand,
+.role-options strong,
+.tranche-head strong,
+.assessment-summary > div > strong,
+.application-row h3,
+.opportunity h2 {
+  color: var(--heading);
 }
