@@ -1,0 +1,22 @@
+{
+  "checkedAtUTC": "2026-10-25T02:53:32.018684+00:00",
+  "server": "https://s1.ripple.com:51234/",
+  "method": "feature",
+  "features": {
+    "LendingProtocol": {
+      "id": "565B90CA1AB2B9D42208ED10884188C64F9E19083DECB9634AAF06EB03299509",
+      "enabled": false,
+      "supported": true
+    },
+    "SingleAssetVault": {
+      "id": "81BD2619B6B3C8625AC5D0BC01DE17F06C3F0AB95C7C87C93715B87A4FD240D8",
+      "enabled": false,
+      "supported": true
+    },
+    "LendingProtocolV1_1": {
+      "id": "A360E2BFD775A5B0DCE1C36C16DF31B72735A57584FD163655D2F9564F8E7AC8",
+      "enabled": false,
+      "supported": false
+    }
+  }
+}

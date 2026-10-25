@@ -1,0 +1,11 @@
+# Sponsor integration status
+
+| Integration          | Delivered                                                                               | Live evidence / limitation                                                                                                                       |
+| -------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| XRPL EVM             | Solidity facility, local real transactions, testnet configuration and deployment script | Local chain only. No public deployment or native XLS-66 loan.                                                                                    |
+| QuickNode            | `QUICKNODE_RPC_URL` support in a receipt-verification CLI                               | No configured endpoint and no verified QuickNode infrastructure use. Compatible RPC support alone is not a bounty claim.                         |
+| AI                   | Modular deterministic investment-summary adapter                                        | No LLM credentials or LLM calls. The finance engine never depends on model output.                                                               |
+| Mastercard AP4M      | Not integrated                                                                          | No resource purchase, HTTP 402 handling, voucher signature, or RLUSD settlement. Ordinary mock loan funding does not establish AP4M eligibility. |
+| AWS AgentCore / x402 | Not integrated                                                                          | No AWS resources, agent runtime, or agentic payment flow.                                                                                        |
+
+The core marketplace was prioritized over optional payment/service integrations. Sponsor qualification has not been established. Future AP4M work could purchase a real priced information resource with a dedicated agent and retain the actual payment receipt. That would require verifying the sponsor's current integration guide and the event's rules, plus separate credentials and explicit spending authorization.

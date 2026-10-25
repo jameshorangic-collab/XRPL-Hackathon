@@ -1,0 +1,511 @@
+{
+  "environment": "Browser simulation; local chain evidence separately recorded",
+  "asOf": "2026-10-24",
+  "portfolio": {
+    "id": "BS-2026-001",
+    "originator": "Meridian Business Credit",
+    "assetClass": "Small business",
+    "target": 10000000,
+    "retention": 500000,
+    "maxCostBps": 1150,
+    "maxSeniorAdvanceBps": 8500,
+    "termMonths": 12,
+    "deadline": "2026-11-07",
+    "feeBps": 50,
+    "loans": [
+      {
+        "id": "MBC-001",
+        "business": "Northline Logistics",
+        "sector": "Logistics",
+        "principal": 2500000,
+        "couponBps": 1500,
+        "months": 12,
+        "grade": "B+",
+        "pdBps": 400,
+        "recoveryBps": 4000,
+        "status": "current"
+      },
+      {
+        "id": "MBC-002",
+        "business": "Juniper Medical",
+        "sector": "Healthcare",
+        "principal": 2000000,
+        "couponBps": 1350,
+        "months": 12,
+        "grade": "A−",
+        "pdBps": 250,
+        "recoveryBps": 4500,
+        "status": "current"
+      },
+      {
+        "id": "MBC-003",
+        "business": "Atlas Manufacturing",
+        "sector": "Manufacturing",
+        "principal": 2000000,
+        "couponBps": 1600,
+        "months": 12,
+        "grade": "B",
+        "pdBps": 500,
+        "recoveryBps": 3500,
+        "status": "current"
+      },
+      {
+        "id": "MBC-004",
+        "business": "Fieldwork Foods",
+        "sector": "Food & beverage",
+        "principal": 1500000,
+        "couponBps": 1750,
+        "months": 12,
+        "grade": "B−",
+        "pdBps": 650,
+        "recoveryBps": 3000,
+        "status": "watch"
+      },
+      {
+        "id": "MBC-005",
+        "business": "Cedar Professional",
+        "sector": "Services",
+        "principal": 2000000,
+        "couponBps": 1400,
+        "months": 12,
+        "grade": "B+",
+        "pdBps": 350,
+        "recoveryBps": 4000,
+        "status": "current"
+      }
+    ]
+  },
+  "offers": [
+    {
+      "id": "S-01",
+      "kind": "senior",
+      "investor": "Northstar Credit",
+      "capital": 8000000,
+      "rateBps": 800,
+      "maxAdvanceBps": 8000,
+      "minEnhancementBps": 2000,
+      "maxTermMonths": 18,
+      "eligibleClasses": [
+        "Small business"
+      ],
+      "expires": "2026-11-07",
+      "active": true
+    },
+    {
+      "id": "S-02",
+      "kind": "senior",
+      "investor": "Apex Capital",
+      "capital": 8500000,
+      "rateBps": 950,
+      "maxAdvanceBps": 8500,
+      "minEnhancementBps": 1500,
+      "maxTermMonths": 12,
+      "eligibleClasses": [
+        "Small business"
+      ],
+      "expires": "2026-11-07",
+      "active": true
+    },
+    {
+      "id": "J-01",
+      "kind": "junior",
+      "investor": "Harbor Risk Partners",
+      "capital": 1000000,
+      "rateBps": 1600,
+      "minAllocation": 100000,
+      "maxExposure": 1000000,
+      "maxSectorConcentrationBps": 3500,
+      "eligibleClasses": [
+        "Small business"
+      ],
+      "expires": "2026-11-07",
+      "active": true
+    },
+    {
+      "id": "J-02",
+      "kind": "junior",
+      "investor": "Cobalt Opportunity",
+      "capital": 1000000,
+      "rateBps": 1850,
+      "minAllocation": 100000,
+      "maxExposure": 1000000,
+      "maxSectorConcentrationBps": 4000,
+      "eligibleClasses": [
+        "Small business"
+      ],
+      "expires": "2026-11-07",
+      "active": true
+    },
+    {
+      "id": "J-03",
+      "kind": "junior",
+      "investor": "Granite Alternatives",
+      "capital": 1500000,
+      "rateBps": 2200,
+      "minAllocation": 100000,
+      "maxExposure": 1500000,
+      "maxSectorConcentrationBps": 3500,
+      "eligibleClasses": [
+        "Small business"
+      ],
+      "expires": "2026-11-07",
+      "active": true
+    },
+    {
+      "id": "J-04",
+      "kind": "junior",
+      "investor": "Urban Property Fund",
+      "capital": 2500000,
+      "rateBps": 1200,
+      "minAllocation": 100000,
+      "maxExposure": 2500000,
+      "maxSectorConcentrationBps": 5000,
+      "eligibleClasses": [
+        "Real estate"
+      ],
+      "expires": "2026-11-07",
+      "active": true
+    }
+  ],
+  "scenario": "Competitive market",
+  "result": {
+    "feasible": true,
+    "best": {
+      "senior": {
+        "offerId": "S-01",
+        "investor": "Northstar Credit",
+        "amount": 8000000,
+        "rateBps": 800
+      },
+      "junior": [
+        {
+          "offerId": "J-01",
+          "investor": "Harbor Risk Partners",
+          "amount": 1000000,
+          "rateBps": 1600
+        },
+        {
+          "offerId": "J-02",
+          "investor": "Cobalt Opportunity",
+          "amount": 500000,
+          "rateBps": 1850
+        }
+      ],
+      "retention": 500000,
+      "principal": 10000000,
+      "annualCost": 950037,
+      "annualCostBps": 950,
+      "fee": 57537,
+      "enhancementBps": 2000,
+      "seniorAdvanceBps": 8000,
+      "expectedInterest": 1507500,
+      "margin": 557463
+    },
+    "alternatives": [
+      {
+        "senior": {
+          "offerId": "S-01",
+          "investor": "Northstar Credit",
+          "amount": 8000000,
+          "rateBps": 800
+        },
+        "junior": [
+          {
+            "offerId": "J-01",
+            "investor": "Harbor Risk Partners",
+            "amount": 1000000,
+            "rateBps": 1600
+          },
+          {
+            "offerId": "J-02",
+            "investor": "Cobalt Opportunity",
+            "amount": 500000,
+            "rateBps": 1850
+          }
+        ],
+        "retention": 500000,
+        "principal": 10000000,
+        "annualCost": 950037,
+        "annualCostBps": 950,
+        "fee": 57537,
+        "enhancementBps": 2000,
+        "seniorAdvanceBps": 8000,
+        "expectedInterest": 1507500,
+        "margin": 557463
+      },
+      {
+        "senior": {
+          "offerId": "S-01",
+          "investor": "Northstar Credit",
+          "amount": 7900000,
+          "rateBps": 800
+        },
+        "junior": [
+          {
+            "offerId": "J-01",
+            "investor": "Harbor Risk Partners",
+            "amount": 1000000,
+            "rateBps": 1600
+          },
+          {
+            "offerId": "J-02",
+            "investor": "Cobalt Opportunity",
+            "amount": 600000,
+            "rateBps": 1850
+          }
+        ],
+        "retention": 500000,
+        "principal": 10000000,
+        "annualCost": 960537,
+        "annualCostBps": 961,
+        "fee": 57537,
+        "enhancementBps": 2100,
+        "seniorAdvanceBps": 7900,
+        "expectedInterest": 1507500,
+        "margin": 546963
+      },
+      {
+        "senior": {
+          "offerId": "S-01",
+          "investor": "Northstar Credit",
+          "amount": 7800000,
+          "rateBps": 800
+        },
+        "junior": [
+          {
+            "offerId": "J-01",
+            "investor": "Harbor Risk Partners",
+            "amount": 1000000,
+            "rateBps": 1600
+          },
+          {
+            "offerId": "J-02",
+            "investor": "Cobalt Opportunity",
+            "amount": 700000,
+            "rateBps": 1850
+          }
+        ],
+        "retention": 500000,
+        "principal": 10000000,
+        "annualCost": 971037,
+        "annualCostBps": 971,
+        "fee": 57537,
+        "enhancementBps": 2200,
+        "seniorAdvanceBps": 7800,
+        "expectedInterest": 1507500,
+        "margin": 536463
+      },
+      {
+        "senior": {
+          "offerId": "S-01",
+          "investor": "Northstar Credit",
+          "amount": 7700000,
+          "rateBps": 800
+        },
+        "junior": [
+          {
+            "offerId": "J-01",
+            "investor": "Harbor Risk Partners",
+            "amount": 1000000,
+            "rateBps": 1600
+          },
+          {
+            "offerId": "J-02",
+            "investor": "Cobalt Opportunity",
+            "amount": 800000,
+            "rateBps": 1850
+          }
+        ],
+        "retention": 500000,
+        "principal": 10000000,
+        "annualCost": 981537,
+        "annualCostBps": 982,
+        "fee": 57537,
+        "enhancementBps": 2300,
+        "seniorAdvanceBps": 7700,
+        "expectedInterest": 1507500,
+        "margin": 525963
+      },
+      {
+        "senior": {
+          "offerId": "S-01",
+          "investor": "Northstar Credit",
+          "amount": 7600000,
+          "rateBps": 800
+        },
+        "junior": [
+          {
+            "offerId": "J-01",
+            "investor": "Harbor Risk Partners",
+            "amount": 1000000,
+            "rateBps": 1600
+          },
+          {
+            "offerId": "J-02",
+            "investor": "Cobalt Opportunity",
+            "amount": 900000,
+            "rateBps": 1850
+          }
+        ],
+        "retention": 500000,
+        "principal": 10000000,
+        "annualCost": 992037,
+        "annualCostBps": 992,
+        "fee": 57537,
+        "enhancementBps": 2400,
+        "seniorAdvanceBps": 7600,
+        "expectedInterest": 1507500,
+        "margin": 515463
+      }
+    ],
+    "rejected": [
+      {
+        "offerId": "J-04",
+        "investor": "Urban Property Fund",
+        "reason": "Asset class excluded"
+      }
+    ],
+    "fundingGap": 0
+  },
+  "deal": {
+    "structure": {
+      "senior": {
+        "offerId": "S-01",
+        "investor": "Northstar Credit",
+        "amount": 8000000,
+        "rateBps": 800
+      },
+      "junior": [
+        {
+          "offerId": "J-01",
+          "investor": "Harbor Risk Partners",
+          "amount": 1000000,
+          "rateBps": 1600
+        },
+        {
+          "offerId": "J-02",
+          "investor": "Cobalt Opportunity",
+          "amount": 500000,
+          "rateBps": 1850
+        }
+      ],
+      "retention": 500000,
+      "principal": 10000000,
+      "annualCost": 950037,
+      "annualCostBps": 950,
+      "fee": 57537,
+      "enhancementBps": 2000,
+      "seniorAdvanceBps": 8000,
+      "expectedInterest": 1507500,
+      "margin": 557463
+    },
+    "commitments": [],
+    "status": "funding",
+    "acceptedAt": "2026-10-25T03:14:40.705Z"
+  },
+  "chain": {
+    "token": "0x9A676e781A523b5d0C0e43731313A708CB607508",
+    "facility": "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
+    "chainId": 31337,
+    "blockNumber": 50,
+    "totalClaimed": 11507500,
+    "transactions": [
+      {
+        "action": "Deploy mock USD",
+        "hash": "0xff9d407facbbdee2e710962354c70a2363cdf512dc4a9aa010fa52bfc813bb3b"
+      },
+      {
+        "action": "Register accepted terms",
+        "hash": "0x32abe8033a9313e06a302fc2d80bb20293ace28bb9ebea9df49161334d1092ef"
+      },
+      {
+        "action": "Mint Senior mock funds",
+        "hash": "0x09ab787aec4cfdc00ae3827c19747a579bf592793a49b32aeeba490951b8837e"
+      },
+      {
+        "action": "Approve Senior funds",
+        "hash": "0x339db7ed83911f67dd14963bda141114009783a625e508a6eefdf4f0f1a3f5c5"
+      },
+      {
+        "action": "Commit Senior capital",
+        "hash": "0x5ba3b3188052b9f07dd531e9e4b0ab23e73eac4c6cf8cf8c787ff50420b98c62"
+      },
+      {
+        "action": "Mint Junior 1 mock funds",
+        "hash": "0xfd5443566c346e9f3ba7248ba74b75f438769005af28a0811fc0bed5fc11ed5a"
+      },
+      {
+        "action": "Approve Junior 1 funds",
+        "hash": "0x20dbbb888aefb3c7cd50d3e49e4e69b9ec716c2133c9e81bcd68a3394f67132b"
+      },
+      {
+        "action": "Commit Junior 1 capital",
+        "hash": "0xd366ed4935d5230a34386eda3ab830a49ba16a43706833d7a4f36d2bc6f3b059"
+      },
+      {
+        "action": "Mint Junior 2 mock funds",
+        "hash": "0x37a9060d78e5de0403ed77cc415df033875909afef8c56f9a6cad34217009931"
+      },
+      {
+        "action": "Approve Junior 2 funds",
+        "hash": "0x6381f635599e027a2dd688eeb4bd784bdb97224d6d304170095a725a66064ac8"
+      },
+      {
+        "action": "Commit Junior 2 capital",
+        "hash": "0x1a218178d309287ed2a0ec77124dafda43a1f10dbcc77733067d1d0e1885f732"
+      },
+      {
+        "action": "Mint Originator mock funds",
+        "hash": "0xa1977fd4d9ef25b76ce3025ae7cb95a1a9b845159ed17f90c1bd4e01c22d66a5"
+      },
+      {
+        "action": "Approve Originator funds",
+        "hash": "0xe0c3a2fe82afb4a96ea71c80d1c3f8696e74431a4f183d08b1f149e751541839"
+      },
+      {
+        "action": "Commit Originator capital",
+        "hash": "0x5f20ba03aceebd666b78c1645d69dedbcd56c321d9656bce735cdd24c7a5ce85"
+      },
+      {
+        "action": "Activate funded facility",
+        "hash": "0xc14d4c63f684cfeafa8a9cd80152804e08f59d47f4423a55d7916824fae8d149"
+      },
+      {
+        "action": "Mint simulated collections",
+        "hash": "0xc71afa09d3cca56cd8d5ec7286ff3c5589c57a5580c77860d5adb87dee56f4fc"
+      },
+      {
+        "action": "Approve cash collection",
+        "hash": "0x6e8ac7fa0843fa6a1031b6b4a184e222a42d28efc4f21b232c90711587b8bc70"
+      },
+      {
+        "action": "Record mock collections",
+        "hash": "0xe1b3ea635f2ba0d8ee7234f57212448d7dee3f40c8f65589ffd54d8b7073c580"
+      },
+      {
+        "action": "Settle maturity waterfall",
+        "hash": "0x8fd10c5881a33697bb218d7db5f948aec9f657f2bec6193fa07561a82aef7e0d"
+      },
+      {
+        "action": "Withdraw Senior claim",
+        "hash": "0xc0f709f11e8d3a810fbd0a9976ed20fa4923e489a3ea5e103d88553d50a95c7a"
+      },
+      {
+        "action": "Withdraw Junior 1 claim",
+        "hash": "0x657ab884c5c5ffefb92671c86d46bc7199b482768dd8225d7f078008f70f91ce"
+      },
+      {
+        "action": "Withdraw Junior 2 claim",
+        "hash": "0x8a33d1467a7ec0917331832a4a84bc95c954d4231079f307fecf14859fecd54c"
+      },
+      {
+        "action": "Withdraw Originator claim",
+        "hash": "0x795d19649df2a3269d12a9701e3786c0b4dab37ae7c1fe0598d09e3de48b1150"
+      },
+      {
+        "action": "Withdraw Fee recipient claim",
+        "hash": "0xcfd482eb0ec2f58033c91868ef73a0f4dc6c40698dc664be20e4a370ac555fcf"
+      }
+    ]
+  }
+}

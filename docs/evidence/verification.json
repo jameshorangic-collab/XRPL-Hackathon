@@ -1,0 +1,76 @@
+{
+  "recordedAtUTC": "2026-10-25T03:13:45.745545+00:00",
+  "node": "24.7.0",
+  "commands": [
+    {
+      "command": "npm install / final dependency updates",
+      "status": "passed"
+    },
+    {
+      "command": "npm run lint",
+      "status": "passed"
+    },
+    {
+      "command": "npm test",
+      "status": "passed",
+      "tests": 23,
+      "runner": "Vitest 5.0.5"
+    },
+    {
+      "command": "npm run contracts:test",
+      "status": "passed",
+      "tests": 14
+    },
+    {
+      "command": "npm run contracts:compile",
+      "status": "passed"
+    },
+    {
+      "command": "npm run build (includes tsc -b)",
+      "status": "passed",
+      "builder": "Vite 8.3.5"
+    },
+    {
+      "command": "npm run demo",
+      "status": "started both loopback services successfully"
+    },
+    {
+      "command": "npm run verify:tx -- 0x8fd10c5881a33697bb218d7db5f948aec9f657f2bec6193fa07561a82aef7e0d",
+      "status": "passed",
+      "chainId": 31337,
+      "receiptStatus": 1,
+      "block": 45
+    }
+  ],
+  "browserChecks": [
+    "initial infeasibility",
+    "competitive clearing",
+    "create cheaper junior bid",
+    "withdraw bid",
+    "edit collection fee",
+    "loan tape invalid and sample validation",
+    "expensive capital infeasibility",
+    "capital shortfall and $42000 gap",
+    "better-pricing $650 savings",
+    "accept structure",
+    "partial and complete browser commitments",
+    "85 and 70 percent principal recovery",
+    "genuine local funding and settlement with exact domain reconciliation",
+    "responsive overview effective CSS widths 1800 and 390",
+    "final local settlement status and paid allocation display"
+  ],
+  "audit": {
+    "runtime": 0,
+    "development": {
+      "low": 19,
+      "moderate": 10,
+      "high": 18,
+      "critical": 0
+    }
+  },
+  "limits": [
+    "manual connected-browser checks, no committed browser test runner",
+    "no public testnet deployment",
+    "no sponsor credentials or paid integration"
+  ]
+}

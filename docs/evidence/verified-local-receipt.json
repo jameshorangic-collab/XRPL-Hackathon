@@ -1,0 +1,9 @@
+{
+  "chainId": 31337,
+  "hash": "0x8fd10c5881a33697bb218d7db5f948aec9f657f2bec6193fa07561a82aef7e0d",
+  "status": 1,
+  "blockNumber": 45,
+  "contractAddress": null,
+  "gasUsed": "350548",
+  "confirmed": true
+}
