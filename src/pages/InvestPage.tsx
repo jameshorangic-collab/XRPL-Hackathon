@@ -91,7 +91,7 @@ export default function InvestPage() {
                     <th>Indicative yield</th>
                     <th>Term</th>
                     <th>Risk summary</th>
-                    <th>Funding progress</th>
+                    <th>Committed · simulated</th>
                     <th />
                   </tr>
                 </thead>
@@ -120,18 +120,20 @@ export default function InvestPage() {
                         {l.loan.months} mo
                       </td>
                       <td data-label="Risk summary">
-                        <Badge
-                          tone={
-                            l.loan.grade.includes("lower")
-                              ? "good"
-                              : l.loan.grade.includes("higher")
-                                ? "warning"
-                                : "neutral"
-                          }
-                        >
-                          {l.loan.grade}
-                        </Badge>
-                        <small>PD {percent(l.loan.pdBps)} assumed</small>
+                        <div className="cell-stack">
+                          <Badge
+                            tone={
+                              l.loan.grade.includes("lower")
+                                ? "good"
+                                : l.loan.grade.includes("higher")
+                                  ? "warning"
+                                  : "neutral"
+                            }
+                          >
+                            {l.loan.grade}
+                          </Badge>
+                          <small>PD {percent(l.loan.pdBps)} assumed</small>
+                        </div>
                       </td>
                       <td data-label="Funding">
                         <FundingProgress state={state} id={l.id} />

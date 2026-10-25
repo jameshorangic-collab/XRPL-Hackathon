@@ -19,6 +19,7 @@ import {
   StructureTable,
   StressTable,
   title,
+  positionLabel,
 } from "./ui";
 import { trancheTotal } from "../domain/marketFinance";
 import type { Tranche } from "../domain/marketTypes";
@@ -235,6 +236,13 @@ export default function InvestmentPanel({
             })}
           </div>
         )}
+        {portfolio && activeBids.length === 0 && (
+          <p className="callout small">
+            No investor quotes are in this order book yet. To demo a full
+            capital stack, open Dashboard → Development / demo controls → Load
+            diversified portfolio.
+          </p>
+        )}
         <div className="bid-layout">
           <form onSubmit={submit}>
             <div className="form-row">
@@ -314,7 +322,7 @@ export default function InvestmentPanel({
             <dl>
               <div>
                 <dt>Position</dt>
-                <dd>{tranche === "whole" ? "Whole loan" : title(tranche)}</dd>
+                <dd>{positionLabel(tranche)}</dd>
               </div>
               <div>
                 <dt>Amount</dt>
@@ -332,7 +340,7 @@ export default function InvestmentPanel({
                 <dt>Your bid here</dt>
                 <dd>
                   {positionBid
-                    ? `${title(positionBid.status)} · ${money(positionBid.amount)}`
+                    ? `${Object.values(state.commitments).some((c) => c.bidId === positionBid.id) ? "Committed" : title(positionBid.status)} · ${money(positionBid.amount)}`
                     : "None yet"}
                 </dd>
               </div>
@@ -395,7 +403,7 @@ export default function InvestmentPanel({
                   return (
                     <tr key={b.id}>
                       <td>
-                        {title(b.tranche)}
+                        {positionLabel(b.tranche)}
                         <small>{percent(b.rateBps)} / yr</small>
                       </td>
                       <td>
@@ -534,7 +542,7 @@ export default function InvestmentPanel({
                 {activeBids.map((b) => (
                   <tr key={b.id}>
                     <td>{state.users[b.userId]?.name}</td>
-                    <td>{title(b.tranche)}</td>
+                    <td>{positionLabel(b.tranche)}</td>
                     <td>{money(b.amount)}</td>
                     <td>{percent(b.rateBps)}</td>
                   </tr>

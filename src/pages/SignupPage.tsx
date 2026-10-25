@@ -47,7 +47,9 @@ export default function SignupPage() {
   return (
     <main className="signup">
       <div className="signup-card">
-        <span className="eyebrow">{current ? "Account" : "BACKSTOP"}</span>
+        <span className="eyebrow">
+          {current ? "Account" : "Small-business credit marketplace"}
+        </span>
         <h1>
           {current
             ? "Your demo profile"

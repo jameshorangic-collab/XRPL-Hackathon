@@ -9,6 +9,7 @@ import {
   money,
   percent,
   title,
+  positionLabel,
 } from "../components/ui";
 import { availableToBid, reservedBalance } from "../domain/marketplace";
 import { termInterest } from "../domain/underwriting";
@@ -224,7 +225,7 @@ export default function DashboardPage() {
                           {state.portfolios[b.opportunityId]?.name ??
                             state.loans[b.opportunityId]?.loan.business}
                         </td>
-                        <td>{title(b.tranche)}</td>
+                        <td>{positionLabel(b.tranche)}</td>
                         <td>{money(b.amount)}</td>
                         <td>{percent(b.rateBps)} / yr</td>
                         <td>
@@ -285,7 +286,7 @@ export default function DashboardPage() {
                             {state.portfolios[c.opportunityId]?.name ??
                               state.loans[c.opportunityId]?.loan.business}
                             <small>
-                              {title(c.tranche)} · Simulated Commitment
+                              {positionLabel(c.tranche)} · Simulated Commitment
                             </small>
                           </td>
                           <td>{money(c.amount)}</td>

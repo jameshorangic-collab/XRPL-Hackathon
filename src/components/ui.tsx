@@ -16,6 +16,8 @@ export const money = (v: number, precise = false) =>
 export const percent = (bps: number) => `${(bps / 100).toFixed(2)}%`;
 export const title = (s: string) =>
   s.replaceAll("_", " ").replace(/^./, (c) => c.toUpperCase());
+export const positionLabel = (t: string) =>
+  t === "whole" ? "Whole loan" : title(t);
 export const dateTime = (s: string) =>
   new Date(s).toLocaleString("en-US", {
     timeZone: "America/New_York",
@@ -81,9 +83,8 @@ export function FundingProgress({
   return (
     <div className="funding">
       <div>
-        <span>
-          {total ? Math.floor((committed * 100) / total) : 0}% committed ·
-          simulated
+        <span title="Simulated commitments">
+          {total ? Math.floor((committed * 100) / total) : 0}% committed
         </span>
         <strong>
           {money(committed)} / {money(total)}

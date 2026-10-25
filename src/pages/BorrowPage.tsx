@@ -217,7 +217,7 @@ export default function BorrowPage() {
               <h3>Financial information</h3>
               <div className="form-row three">
                 <label>
-                  Monthly revenue (USD)
+                  Revenue (USD/mo)
                   <input
                     type="number"
                     min={1}
@@ -229,7 +229,7 @@ export default function BorrowPage() {
                   />
                 </label>
                 <label>
-                  Operating expenses (USD/mo)
+                  Expenses (USD/mo)
                   <input
                     type="number"
                     min={0}
@@ -241,7 +241,7 @@ export default function BorrowPage() {
                   />
                 </label>
                 <label>
-                  Existing debt payments (USD/mo)
+                  Existing debt (USD/mo)
                   <input
                     type="number"
                     min={0}
