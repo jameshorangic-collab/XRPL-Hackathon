@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { Check, X } from "lucide-react";
 import { useApp } from "./AppContext";
 import {
   availableToBid,
@@ -19,8 +20,64 @@ import {
   StressTable,
   title,
 } from "./ui";
-import type { Tranche } from "../domain/marketTypes";
-import { navigate } from "../router";
+import type { Bid, CapitalStructure, Tranche } from "../domain/marketTypes";
+import { trancheTotal } from "../domain/marketFinance";
+const trancheInfo: Record<
+  Tranche,
+  { label: string; priority: string; risk: string }
+> = {
+  senior: {
+    label: "Senior",
+    priority: "1st repayment priority",
+    risk: "Paid first. Lower risk and lower indicative yield, but not risk-free.",
+  },
+  mezzanine: {
+    label: "Mezzanine",
+    priority: "2nd repayment priority",
+    risk: "Paid after senior. Intermediate risk and yield.",
+  },
+  junior: {
+    label: "Junior",
+    priority: "3rd repayment priority",
+    risk: "Absorbs losses after originator retention, before mezzanine and senior. Higher potential yield; returns not guaranteed.",
+  },
+  whole: {
+    label: "Whole loan",
+    priority: "Single position",
+    risk: "Direct exposure to one business. No diversification.",
+  },
+};
+function TrancheMarket({
+  t,
+  bids,
+  structure,
+}: {
+  t: Tranche;
+  bids: Bid[];
+  structure?: CapitalStructure;
+}) {
+  const rates = bids.filter((b) => b.tranche === t).map((b) => b.rateBps);
+  return (
+    <dl className="tranche-data">
+      <div>
+        <dt>Bids in book</dt>
+        <dd>
+          {rates.length
+            ? `${rates.length} · ${percent(Math.min(...rates))}${
+                rates.length > 1 ? `–${percent(Math.max(...rates))}` : ""
+              }`
+            : "None yet"}
+        </dd>
+      </div>
+      <div>
+        <dt>Cleared allocation</dt>
+        <dd>{structure ? money(trancheTotal(structure, t)) : "Not cleared"}</dd>
+      </div>
+    </dl>
+  );
+}
+const sumAmounts = (xs: { amount: number }[]) =>
+  xs.reduce((t, x) => t + x.amount, 0);
 export default function InvestmentPanel({
   opportunityId: id,
   close,
@@ -28,7 +85,11 @@ export default function InvestmentPanel({
   opportunityId: string;
   close: () => void;
 }) {
-  const { state, repository, action, busy } = useApp();
+  const { state, repository, action, busy, statuses } = useApp();
+  const ref = useRef<HTMLElement>(null);
+  useEffect(() => {
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
   const portfolio = state.portfolios[id];
   const listing = state.loans[id];
   const plan = state.plans[id];
@@ -55,6 +116,22 @@ export default function InvestmentPanel({
     (b) =>
       b.opportunityId === id && !["withdrawn", "closed"].includes(b.status),
   );
+  const myCommitments = Object.values(state.commitments).filter(
+    (c) => c.userId === current.id && c.opportunityId === id,
+  );
+  const selectedForMe = myBids.some((b) =>
+    structure?.allocations.some((a) => a.bidId === b.id),
+  );
+  const xrpl = statuses.find((s) => s.id === "xrpl");
+  const progress: [string, boolean][] = [
+    ["Bid submitted", myBids.length > 0],
+    ["Selected by clearing", selectedForMe],
+    ["Capital committed · simulated", myCommitments.length > 0],
+    ["Settled", !!state.settlements[id] && myCommitments.length > 0],
+  ];
+  const tranches: Tranche[] = portfolio
+    ? ["senior", "mezzanine", "junior"]
+    : ["whole"];
   const changeTranche = (t: Tranche) => {
     setTranche(t);
     setYieldPct(t === "mezzanine" ? 12 : t === "junior" ? 16 : 8);
@@ -77,6 +154,7 @@ export default function InvestmentPanel({
   }
   return (
     <section
+      ref={ref}
       className="panel investment-panel"
       aria-labelledby="investment-title"
     >
@@ -89,12 +167,24 @@ export default function InvestmentPanel({
             {portfolio?.name ?? listing.loan.business}
           </h2>
         </div>
-        <button onClick={close} aria-label="Close investment panel">
-          Close
+        <button
+          className="icon-button"
+          onClick={close}
+          aria-label="Close investment panel"
+        >
+          <X size={16} />
         </button>
       </div>
+      <ol className="progress-strip" aria-label="Your investment status">
+        {progress.map(([label, done], i) => (
+          <li key={label} className={done ? "done" : ""}>
+            <span>{done ? <Check size={12} /> : i + 1}</span>
+            {label}
+          </li>
+        ))}
+      </ol>
       <FundingProgress state={state} id={id} />
-      <div className="detail-grid">
+      <div className="detail-grid four">
         <p>
           <span>Principal</span>
           <strong>{money(principal)}</strong>
@@ -123,98 +213,181 @@ export default function InvestmentPanel({
         </p>
       )}
       <div className="subsection">
-        <h3>1. Submit a bid</h3>
+        <h3>1. Choose your position and submit a bid</h3>
         <p className="small muted">
-          Propose capital and annual simple yield. A bid reserves demo buying
-          capacity, but is not a funding commitment.
+          A bid states the capital and annual simple yield you require. It
+          reserves demo buying capacity but is not a funding commitment.
         </p>
-        <form onSubmit={submit}>
-          <div className="form-row">
-            <label>
-              Position
-              <select
-                value={tranche}
-                onChange={(e) => changeTranche(e.target.value as Tranche)}
-                disabled={!!plan?.locked}
-              >
-                {portfolio ? (
-                  <>
-                    <option value="senior">Senior · first paid</option>
-                    <option value="mezzanine">Mezzanine · after senior</option>
-                    <option value="junior">Junior · after mezzanine</option>
-                  </>
-                ) : (
-                  <option value="whole">Whole loan</option>
-                )}
-              </select>
-            </label>
-            <label>
-              Proposed investment ($)
-              <input
-                type="number"
-                min={portfolio ? 1000 : 100}
-                max={principal / 100}
-                step={portfolio ? 1000 : 100}
-                value={amount}
-                onChange={(e) => setAmount(Number(e.target.value))}
-                required
-                disabled={!!plan?.locked}
-              />
-            </label>
-          </div>
-          <div className="form-row">
-            <label>
-              Required annual simple yield (%)
-              <input
-                type="number"
-                min={0}
-                max={50}
-                step="0.01"
-                value={yieldPct}
-                onChange={(e) => setYieldPct(Number(e.target.value))}
-                required
-                disabled={!!plan?.locked}
-              />
-            </label>
-            <label>
-              Bid expiration
-              <input
-                type="date"
-                value={expiry}
-                onChange={(e) => setExpiry(e.target.value)}
-                required
-                disabled={!!plan?.locked}
-              />
-            </label>
-          </div>
-          <p className="small">
-            Maximum principal at risk:{" "}
-            <strong>{money(Math.round(Math.max(0, amount) * 100))}</strong>.
-            Actual awarded capital can be a partial fill. Returns are not
-            guaranteed.
-          </p>
-          {portfolio && (
-            <p className="small muted">
-              Senior requires 20% subordinated enhancement and at most 80%
-              advance. Mezzanine requires 10% junior + retained enhancement.
-              Originator retention absorbs losses before external junior.
-            </p>
-          )}
-          <button
-            className="primary"
-            disabled={busy || !!plan?.locked || current.role !== "investor"}
-          >
-            Submit Bid
-          </button>
-          {current.role !== "investor" && (
-            <button
-              type="button"
-              className="link-button"
-              onClick={() => navigate("/signup")}
+        <form onSubmit={submit} className="bid-layout">
+          <div>
+            <div
+              className={`tranche-cards ${portfolio ? "" : "single"}`}
+              role="radiogroup"
+              aria-label="Position"
             >
-              Choose the investor role in Account
+              {tranches.map((t, i) => (
+                <label
+                  key={t}
+                  className={`tranche-card ${t} ${tranche === t ? "selected" : ""}`}
+                >
+                  <input
+                    type="radio"
+                    name="tranche"
+                    value={t}
+                    checked={tranche === t}
+                    onChange={() => changeTranche(t)}
+                    disabled={!!plan?.locked}
+                  />
+                  <span className="tranche-head">
+                    <span className="tranche-rank">
+                      {portfolio ? `0${i + 1}` : "—"}
+                    </span>
+                    <strong>{trancheInfo[t].label}</strong>
+                    {tranche === t && <Check size={16} />}
+                  </span>
+                  <span className="tranche-priority">
+                    {trancheInfo[t].priority}
+                  </span>
+                  <span className="tranche-risk">{trancheInfo[t].risk}</span>
+                  {portfolio ? (
+                    <TrancheMarket
+                      t={t}
+                      bids={activeBids}
+                      structure={structure}
+                    />
+                  ) : (
+                    <dl className="tranche-data">
+                      <div>
+                        <dt>Indicative coupon cap</dt>
+                        <dd>{percent(listing.loan.couponBps)} / yr</dd>
+                      </div>
+                      <div>
+                        <dt>Bids in book</dt>
+                        <dd>{activeBids.length || "None yet"}</dd>
+                      </div>
+                    </dl>
+                  )}
+                </label>
+              ))}
+            </div>
+            {portfolio && (
+              <p className="small muted">
+                Senior requires 20% subordinated enhancement and at most 80%
+                advance. Mezzanine requires 10% junior + retained enhancement.
+                Originator retention absorbs losses before external junior.
+              </p>
+            )}
+            <div className="form-row three">
+              <label>
+                Investment amount ($)
+                <input
+                  type="number"
+                  min={portfolio ? 1000 : 100}
+                  max={principal / 100}
+                  step={portfolio ? 1000 : 100}
+                  value={amount}
+                  onChange={(e) => setAmount(Number(e.target.value))}
+                  required
+                  disabled={!!plan?.locked}
+                />
+              </label>
+              <label>
+                Required yield (% / yr, simple)
+                <input
+                  type="number"
+                  min={0}
+                  max={50}
+                  step="0.01"
+                  value={yieldPct}
+                  onChange={(e) => setYieldPct(Number(e.target.value))}
+                  required
+                  disabled={!!plan?.locked}
+                />
+              </label>
+              <label>
+                Bid expiration
+                <input
+                  type="date"
+                  value={expiry}
+                  onChange={(e) => setExpiry(e.target.value)}
+                  required
+                  disabled={!!plan?.locked}
+                />
+              </label>
+            </div>
+          </div>
+          <aside className="bid-summary" aria-label="Bid summary">
+            <h4>Bid summary</h4>
+            <dl>
+              <div>
+                <dt>Position</dt>
+                <dd>{trancheInfo[tranche].label}</dd>
+              </div>
+              <div>
+                <dt>Amount</dt>
+                <dd>{money(Math.round(Math.max(0, amount) * 100))}</dd>
+              </div>
+              <div>
+                <dt>Required yield</dt>
+                <dd>{yieldPct.toFixed(2)}% / yr</dd>
+              </div>
+              <div>
+                <dt>Term</dt>
+                <dd>
+                  {portfolio?.terms.termMonths ?? listing.loan.months} months
+                </dd>
+              </div>
+              <div>
+                <dt>Max principal at risk</dt>
+                <dd>{money(Math.round(Math.max(0, amount) * 100))}</dd>
+              </div>
+            </dl>
+            <p className="small muted">
+              Awards can be partial fills. Yields are your bid terms, not
+              guaranteed returns.
+            </p>
+            <button
+              className="primary large block"
+              disabled={busy || !!plan?.locked || current.role !== "investor"}
+            >
+              Submit Bid
             </button>
-          )}
+            {current.role !== "investor" && (
+              <p className="small">
+                Switch to the <strong>Investor</strong> role (top right) to bid.
+              </p>
+            )}
+            <dl className="summary-status">
+              <div>
+                <dt>Wallet</dt>
+                <dd>Not required for bids</dd>
+              </div>
+              <div>
+                <dt>XRPL EVM</dt>
+                <dd>
+                  <Badge
+                    tone={
+                      xrpl?.status === "Connected"
+                        ? "good"
+                        : xrpl?.status === "Error"
+                          ? "bad"
+                          : "neutral"
+                    }
+                  >
+                    {xrpl?.status ?? "Pending"}
+                  </Badge>
+                </dd>
+              </div>
+              <div>
+                <dt>Your commitment</dt>
+                <dd>
+                  {myCommitments.length
+                    ? `${money(sumAmounts(myCommitments))} · simulated`
+                    : "None"}
+                </dd>
+              </div>
+            </dl>
+          </aside>
         </form>
       </div>
       <div className="subsection">

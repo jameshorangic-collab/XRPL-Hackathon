@@ -29,6 +29,12 @@ export default function DashboardPage() {
   const commitments = Object.values(state.commitments).filter(
     (c) => c.userId === user.id,
   );
+  const settledResults = commitments.flatMap((c) => {
+    const d = state.settlements[c.opportunityId]?.distributions.find(
+      (d) => d.bidId === c.bidId,
+    );
+    return d ? [d.principal + d.interest - c.amount] : [];
+  });
   const transactions = state.transactions
     .filter((t) => t.userId === user.id)
     .slice()
@@ -172,10 +178,10 @@ export default function DashboardPage() {
         </>
       ) : (
         <>
-          <div className="stats three">
+          <div className="stats four">
             <Stat
-              label="Simulated cash balance"
-              value={money(user.cashBalance)}
+              label="Active bids"
+              value={bids.filter((b) => b.status === "active").length}
             />
             <Stat
               label="Unreserved buying capacity"
@@ -191,8 +197,17 @@ export default function DashboardPage() {
                 ),
               )}
             />
+            <Stat
+              label="Realized P/L · simulated"
+              value={
+                settledResults.length
+                  ? money(sum(settledResults), true)
+                  : "None settled"
+              }
+            />
           </div>
           <p className="small muted">
+            Simulated cash balance {money(user.cashBalance)}.{" "}
             {money(reservedBalance(state, user.id))} is reserved by your
             outstanding bids. Cash and reservations are simulated, not wallet
             token balances.
@@ -351,10 +366,10 @@ export default function DashboardPage() {
           </Empty>
         )}
       </section>
-      <DemoControls />
-      <WalletPanel />
-      <IntegrationEvidence />
       <IntegrationPanel />
+      <IntegrationEvidence />
+      <WalletPanel />
+      <DemoControls />
       <LegacyChainPanel />
     </main>
   );

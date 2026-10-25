@@ -9,6 +9,8 @@ import { switchProfileRole } from "./domain/marketplace";
 import { storageKey } from "./data/repository";
 import { createSeedState } from "./data/marketSeed";
 import IntegrationWalletBridge from "./components/IntegrationWalletBridge";
+import LiquidBackground from "./components/LiquidBackground";
+import Logo from "./components/Logo";
 class StartupBoundary extends Component<
   { children: ReactNode },
   { error: string }
@@ -65,8 +67,14 @@ function Application() {
     ["/dashboard", "Dashboard"],
     ["/signup", "Account"],
   ];
+  const switchRole = (role: "borrower" | "investor") =>
+    void action(async () => {
+      await repository.transact((s) => switchProfileRole(s, role));
+      navigate(role === "borrower" ? "/borrow" : "/invest");
+    });
   return (
     <>
+      <LiquidBackground />
       <header className="app-header">
         <a
           className="brand"
@@ -76,7 +84,8 @@ function Application() {
             navigate(user ? "/dashboard" : "/signup");
           }}
         >
-          BACKSTOP
+          <Logo />
+          Backstop
         </a>
         {user && (
           <nav aria-label="Main navigation">
@@ -95,47 +104,55 @@ function Application() {
             ))}
           </nav>
         )}
-        <span className="demo-label">Synthetic demo</span>
-      </header>
-      {user && (
-        <div className="profile-bar">
-          <span>
-            Demo profile: <strong>{user.name}</strong>
-          </span>
-          <label>
-            Role
-            <select
+        <div className="header-right">
+          {user && (
+            <div
+              className="role-switch"
+              role="group"
               aria-label="Demo profile role"
-              value={user.role}
-              disabled={busy}
-              onChange={(e) => {
-                const role = e.target.value as "borrower" | "investor";
-                void action(async () => {
-                  await repository.transact((s) => switchProfileRole(s, role));
-                  navigate(role === "borrower" ? "/borrow" : "/invest");
-                });
-              }}
             >
-              <option value="borrower">Borrower</option>
-              <option value="investor">Investor</option>
-            </select>
-          </label>
+              {(["borrower", "investor"] as const).map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  aria-pressed={user.role === r}
+                  disabled={busy || user.role === r}
+                  onClick={() => switchRole(r)}
+                >
+                  {r === "borrower" ? "Borrower" : "Investor"}
+                </button>
+              ))}
+            </div>
+          )}
+          {user && (
+            <span className="user-chip" title={user.email}>
+              {user.name
+                .split(/\s+/)
+                .map((w) => w[0])
+                .join("")
+                .slice(0, 2)
+                .toUpperCase()}
+            </span>
+          )}
         </div>
-      )}
+      </header>
       <p className="demo-banner">
-        Synthetic applications and assessments. Marketplace funding is
+        <span className="demo-label">Synthetic demo</span>
+        Applications and assessments are synthetic. Marketplace funding is
         simulated. Demo profiles are not secure authentication.
       </p>
       <IntegrationWalletBridge />
-      {!user || route === "/signup" ? (
-        <SignupPage />
-      ) : route === "/borrow" ? (
-        <BorrowPage />
-      ) : route === "/invest" ? (
-        <InvestPage />
-      ) : (
-        <DashboardPage />
-      )}
+      <div className="page-transition" key={user ? route : "/signup"}>
+        {!user || route === "/signup" ? (
+          <SignupPage />
+        ) : route === "/borrow" ? (
+          <BorrowPage />
+        ) : route === "/invest" ? (
+          <InvestPage />
+        ) : (
+          <DashboardPage />
+        )}
+      </div>
       <footer>
         BACKSTOP · Hackathon prototype · Browser data persists on this device
       </footer>

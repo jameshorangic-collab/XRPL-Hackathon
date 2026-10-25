@@ -1,3 +1,4 @@
+import { Check } from "lucide-react";
 import { useApp } from "./AppContext";
 import { Badge, money, percent, title } from "./ui";
 import { DemoReportProvider } from "../integrations/mastercard-ap4m";
@@ -80,8 +81,19 @@ export default function UnderwritingPanel({
       </div>
       <ol className="timeline">
         {steps.map(([label, done, detail], i) => (
-          <li key={i} className={done ? "complete" : ""}>
-            <span className="step-number">{done ? "✓" : i + 1}</span>
+          <li
+            key={i}
+            className={
+              done
+                ? "complete"
+                : job.status === "running" && i === 1
+                  ? "active"
+                  : ""
+            }
+          >
+            <span className="step-number">
+              {done ? <Check size={12} /> : i + 1}
+            </span>
             <div>
               <strong>{label}</strong>
               <p>{detail}</p>
@@ -107,6 +119,35 @@ export default function UnderwritingPanel({
       )}
       {assessment && (
         <>
+          <div className={`assessment-summary ${assessment.recommendation}`}>
+            <div>
+              <span>Preliminary assessment</span>
+              <strong>{title(assessment.recommendation)}</strong>
+              <p>
+                {title(assessment.risk)} risk · indicative coupon cap{" "}
+                {percent(assessment.indicativeRateBps)} / yr
+              </p>
+            </div>
+            <dl>
+              <div>
+                <dt>Assessed by</dt>
+                <dd>
+                  {assessment.provider === "aws-agentcore"
+                    ? "AWS AgentCore"
+                    : "Deterministic demo rules"}
+                </dd>
+              </div>
+              <div>
+                <dt>Paid report purchased</dt>
+                <dd>{paid ? "Yes · payment verified" : "No"}</dd>
+              </div>
+            </dl>
+          </div>
+          <p className="small muted">
+            {assessment.recommendation === "eligible"
+              ? "Eligible means the request is listed for investor bids. It is not loan approval or funding."
+              : "A recommendation is not a final credit decision."}
+          </p>
           <div className="stats three">
             <div className="stat">
               <span>Monthly cash available</span>
@@ -128,24 +169,34 @@ export default function UnderwritingPanel({
             Principal and coupon are due in one bullet payment; the monthly
             amount is a reserve assumption.
           </p>
-          <h3>Risk indicators</h3>
-          <ul>
-            {assessment.indicators.map((t) => (
-              <li key={t}>{t}</li>
-            ))}
-          </ul>
-          <h3>Information gaps</h3>
-          <ul>
-            {assessment.gaps.map((t) => (
-              <li key={t}>{t}</li>
-            ))}
-          </ul>
-          <h3>Assessment reasoning</h3>
-          <ul>
-            {assessment.reasoning.map((t) => (
-              <li key={t}>{t}</li>
-            ))}
-          </ul>
+          <div className="finding-grid">
+            <div>
+              <h3>Risk factors</h3>
+              <ul>
+                {assessment.indicators.map((t) => (
+                  <li key={t}>{t}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3>Missing information</h3>
+              <ul>
+                {assessment.gaps.map((t) => (
+                  <li key={t}>{t}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <details>
+            <summary>
+              Assessment reasoning ({assessment.reasoning.length})
+            </summary>
+            <ul>
+              {assessment.reasoning.map((t) => (
+                <li key={t}>{t}</li>
+              ))}
+            </ul>
+          </details>
           {listing?.operatorApproval && (
             <p className="callout">
               Demo-operator approval: {listing.operatorApproval.reason}. This
