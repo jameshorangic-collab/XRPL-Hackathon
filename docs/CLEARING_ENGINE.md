@@ -1,28 +1,31 @@
 # Competitive clearing engine
 
-`src/domain/clearing.ts` performs a deterministic bounded search. It uses actual submitted synthetic quotes and never asks an LLM to choose allocations or change rates.
+Financial allocation is deterministic and independent of AI explanations. The original `src/domain/clearing.ts` search is preserved; the new marketplace wrapper is `src/domain/marketFinance.ts`.
 
-## Supported scope
+## Original senior/junior engine
 
-One portfolio of $1,000–$1,000,000, up to ten senior offers and ten junior offers, one primary senior lender, fixed originator retention, and $1,000 allocation increments. Every underlying loan and the facility must be a 12-month annual bullet. A quote can be partially filled, with an explicit junior minimum allocation and maximum exposure. The UI sets junior minimum fill to $1,000 and maximum exposure to its offered capital.
+The original engine supports annual bullet portfolios from $1,000 to $1,000,000, at most ten quotes per tranche, one primary senior lender, multiple external junior investors, and fixed funded retention. The allocation grid is $1,000. It filters quote expiry, asset class, term, concentration, leverage, enhancement, exposure, and invalid identifiers.
 
-## Algorithm
+Junior dynamic programming keeps the cheapest allocation at every total junior amount. For each primary senior quote and junior state, senior dollars are target minus junior minus retention. Exact funding, cash support and a dollar cost ceiling are enforced. Results rank by actual coupon costs plus fees, then higher senior capital and deterministic identifiers. Since remaining constraints depend on aggregate junior dollars, the cheapest junior state is sufficient within these limited assumptions. It is exact on the grid, not arbitrary cents.
 
-1. Validate the loan tape, target reconciliation, retention, dates, rate bounds, and quote identifiers. Duplicate IDs fail the market rather than risk a double allocation.
-2. Exclude withdrawn, expired, asset-ineligible, maturity-ineligible, invalid, or concentration-ineligible bids.
-3. Build a dynamic program keyed by aggregate external junior dollars. For each junior quote, consider no fill and every permitted fill up to its available capital and exposure limit. Each quote is processed once; keep the cheapest allocation for each aggregate amount.
-4. For each senior quote and junior state, set senior dollars = target − retention − junior dollars.
-5. Check senior capital, the lower of portfolio/investor advance limits, minimum subordinated enhancement, exact funding, projected portfolio cash support, and the exact dollar cost ceiling.
-6. Sort feasible structures by total monetary cost, then higher senior capital, then senior offer ID. Return the optimum and up to four further cost-ranked alternatives.
+The original 23 domain tests remain passing. The old contract fixture and legacy seed scenario remain available through the isolated Dashboard developer tool.
 
-The cost ceiling uses exact monetary comparison, before the displayed rate is rounded. Individual quotes never get combined into more capital than their commitment. No structure is accepted if no candidate satisfies all modeled constraints.
+## Three-layer marketplace wrapper
 
-## Why the dynamic program is exact here
+The wrapper limits new marketplace portfolios to $250,000, ten eligible quotes per senior/mezzanine/junior tranche, one primary senior, at most one mezzanine provider, multiple junior providers, and fixed originator contribution. When no eligible mezzanine quote exists, it delegates allocation to the original engine.
 
-For a given total junior amount, all remaining senior constraints depend only on that amount and fixed retention. Bid-level eligibility is checked first, and fills individually enforce the bid's min/max. Therefore a more expensive junior allocation at the same total can never improve the objective or satisfy a new remaining constraint. Retaining only the cheapest state is valid under these limited constraints. New cross-investor dependencies, all-or-none packages, or multiple portfolios would require a different state definition or solver.
+For a three-layer search, reuse the junior dynamic program; enumerate each senior quote, each junior state, and every permissible mezzanine amount (including none) on the $1,000 grid. The senior remainder must satisfy advance and enhancement limits. Senior enhancement includes mezzanine, junior, and retention. The mezzanine quote's minimum enhancement is backed by junior plus retention (default 10% of target). Cost must be supported by modeled borrower interest and the portfolio ceiling. Cheapest feasible cost wins; ties favor more senior capital and stable iteration order.
 
-The search is exact on the disclosed $1,000 grid, not over arbitrary cents. It does not optimize retention, create multiple senior syndicate allocations, infer a yield curve, estimate legally recognized capital relief, or account for opportunity costs of retained equity. The one-deal prototype uses acceptance locking; a shared marketplace needs a durable reservation ledger and bid signatures.
+The loaded fixture adds a $10,000 mezzanine quote at 12%. It clears at senior $80,000 / mezzanine $10,000 / junior $5,000 / retained $5,000, costing $8,975.37 including fees. A bid is only a quote; funded progress remains zero until commitments are actually recorded in simulation.
 
-## Demonstration economics
+## Individual whole-loan matching
 
-The initial scenario withdraws all junior offers and correctly fails. The competitive market allocates $10,000 to Harbor at 16% and $5,000 of Cobalt's $10,000 quote at 18.5%, supporting Northstar's $80,000 senior bid at 8%. Urban Property Fund is excluded for asset class. Reducing Granite's submitted junior rate to 12.5% makes it the selected $15,000 junior provider, reducing projected annual financing cost by $650. Expensive-capital and shortfall scenarios fail honestly.
+Individual loans are separate assets from the portfolio tape. They support whole-loan positions only, with partial fills across investors. Quotes sort by required annual coupon, then submission time and ID. Allocation stops at exact principal; any shortfall remains infeasible. Required coupons above the borrower's indicative cap are rejected. Selected coupons determine borrower modeled interest, with no hidden residual spread. There is no individual-loan diversification claim.
+
+## State and integrity
+
+The first actual simulated commitment locks the selected plan and closes unselected quotes. Bid capacity is reserved across opportunities; cash is debited once per commitment. The retained contribution must also be funded. Selected amounts and retained capital must sum exactly to principal before maturity simulation. Duplicate bid IDs, invalid structures, repeated commitments and repeated final settlement are rejected.
+
+Rejected quotes include eligibility reasons or eligible-but-not-selected explanations. Infeasible markets show capacity shortfall or binding price/enhancement constraints; no fictional allocation is returned. This is a browser-local reservation ledger, not a production shared matching service. Signed quotes, backend authorization, durable concurrency, cross-investor package constraints, and a global optimization solver remain future work.
+
+See [FINANCIAL_MODEL](FINANCIAL_MODEL.md) for repayment priorities and rounding.

@@ -1,38 +1,39 @@
 # BACKSTOP
 
-**Make more loans financeable.** A working local prototype for competitively matching senior funding, external junior capital, and originator retention to finance a synthetic small-business loan portfolio.
+A minimal borrowing and investing marketplace for the XRPL Hackathon. All applications, risk assumptions, balances, investments, and repayments are synthetic demo data.
 
-The default opportunity begins with an unfunded risk layer. Load the competitive market to clear an $80,000 senior / $15,000 junior / $5,000 retained stack. Quoted investor rates determine the winner. A separate Solidity facility enforces actual local token commitments and a maturity payment waterfall.
+**Hosted demo:** https://backstop-xrpl.vercel.app
 
-## Hosted demo
+The app has four pages: `/signup`, `/borrow`, `/invest`, and `/dashboard`. New visitors create a browser-local demo profile, request a loan, receive a deterministic underwriting assessment, and see eligible loans in the investor marketplace. Investors submit bids and then separately commit simulated funding. Portfolio positions support senior, mezzanine, and junior capital plus funded originator retention.
 
-Open **https://backstop-xrpl.vercel.app**. Clearing and browser simulations work on the hosted site. The genuine local EVM lifecycle still requires a local node. This deployment is uploaded directly and is not linked to automatic GitHub deployments; see [deployment details](docs/DEPLOYMENT.md).
+## Run locally
 
-## Run
-
-Requires Node.js 22.19 or a current supported LTS release (verified with Node 24.7) and npm.
+Requires Node.js 22.19+ (verified with Node 24.7) and npm. No optional credentials are required.
 
 ```sh
 npm ci
+npm run dev
+```
+
+Open the Local URL printed by Vite. Data persists in this browser and origin; it is not shared between devices or between localhost and the hosted site. Profiles are not secure authentication. Use synthetic names, emails, and business figures.
+
+For the preserved, separate local Solidity demonstration:
+
+```sh
 npm run contracts:compile
 npm run demo
 ```
 
-Open the Vite Local URL printed in the terminal, normally `http://localhost:5173`. The combined demo starts the browser app and an EVM node bound to loopback. Ctrl+C stops both. No credentials are needed. If ports 5173 or 8545 are already occupied, stop the earlier demo first.
+This starts Vite and a loopback Hardhat node. In Dashboard, expand **Developer tool: preserved local EVM facility**. That fixture uses actual local token transactions, a two-layer senior/junior facility, and an unrestricted two-decimal mock USD token. It is not RLUSD and does not fund the new marketplace's simulated positions.
 
-For the dashboard alone, use `npm run dev`. For a separate local chain, use `npm run chain`. The UI works without a chain until **Execute local lifecycle** is clicked.
+## Demonstrate the MVP
 
-## Try it
+1. Create a borrower profile. In Request Loan, **Fill synthetic example**, then **Submit for Underwriting**. The $10,000 Alder Design Studio request becomes eligible under the disclosed deterministic rules. No AI call or credit-data purchase is claimed.
+2. In Account, create an investor profile. In Invest, open Alder, submit a $10,000 whole-loan bid at 8%, then separately **Commit Funding · simulated**. Refresh to confirm persistence; Dashboard shows the position and simulated transaction without a blockchain hash.
+3. In Dashboard's collapsed **Development / demo controls**, load the diversified portfolio. Invest → Loan Portfolios shows the competitive senior/mezzanine/junior quotes and exact capital identity.
+4. Use the separately labeled demo controls to fund selected synthetic investors and the originator contribution, then simulate repayment or defaults. Final settlement happens once and credits the modeled cash distributions.
 
-1. Run clearing in **Unfunded portfolio**: the engine returns no feasible structure.
-2. Select **Competitive market**, inspect the order book, and run clearing.
-3. Review the selected allocations, projected cost, and exclusions. Accept a structure.
-4. Commit mock capital in the explicitly labeled browser simulation. Partial funding cannot activate it.
-5. Execute the genuine local EVM lifecycle. This deploys, funds, activates, simulates collections, advances local time, settles, and withdraws claims. Real mined transaction hashes are shown.
-6. Explore 85% and 70% principal recovery in **Risk waterfall**.
-7. Try **Better junior pricing**, **Expensive capital**, and **Capital shortfall**. Offer entry, modification, withdrawal, and synthetic loan-tape editing work before a deal is accepted.
-
-See [the judge guide](docs/DEMO.md) for a timed walkthrough.
+Applications with insufficient history or borderline reserve coverage remain **Needs review**, off-market. Explicit demo-operator approval requires a reason; declined applications cannot be approved through that control. See [the demo walkthrough](docs/DEMO.md).
 
 ## Verification
 
@@ -45,40 +46,24 @@ npm run build
 npm audit --omit=dev
 ```
 
-The build includes precompiled local contract ABIs and bytecode in `public/contracts/`; regenerate them after changing Solidity. The financial model uses integer cents and the local mock token has two decimals. It is **not RLUSD**. Solidity accounting and the client model reconcile during each browser chain run.
+The refactor passes 83 application tests and 14 contract tests. Production build includes physical HTML shells for all four routes, preserving refresh/deep-link support on the existing static Vercel deployment. Git pushes do not automatically update that deployment; see [deployment](docs/DEPLOYMENT.md).
 
-## Scope and limitations
+## Integrations and scope
 
-One portfolio, one primary senior lender, up to ten offers per tranche, and a 365-day bullet facility. Clearing is exact over $1,000 allocations. Browser state is saved in localStorage; there is no authenticated shared backend. Demo roles are convenience controls. Contracts are unaudited, originator-reported cash receipts are simulated, and synthetic risk assumptions are unvalidated.
+AWS AgentCore, Mastercard AP4M, and QuickNode have typed server-gateway interfaces; no gateway backend is included. The browser wallet adapter supports chain checks, balances, receipts, funding, and events, but no verified testnet facility is linked to the new marketplace. Default funding is explicitly simulated. The preserved local blockchain fixture remains usable separately.
 
-There has been no public testnet deployment, RLUSD use, native XLS-66 loan creation, or paid sponsor integration. Testnet deployment and optional RPC receipt-verification scripts are supplied. Production dependencies have no reported advisories in the recorded audit; development tooling has outstanding advisories described in [SECURITY](docs/SECURITY.md).
+Copy `.env.example` to a local ignored `.env` only when configuring integrations. All `VITE_` values are public. Keep AWS credentials, AP4M signing keys, private RPC URLs, and deployer keys on a trusted server or local deployment environment, never in prompts or browser variables. A configured URL alone does not establish a live integration. See [API contracts](docs/API_CONTRACTS.md).
 
-## Optional XRPL EVM Testnet deployment
-
-Copy `.env.example` to `.env` locally and populate a dedicated testnet deployer key and the public participant addresses. Never paste secrets into chat or commit the file. The deployer needs test XRP. Then run:
-
-```sh
-npm run deploy:testnet
-```
-
-The script validates chain 1449000, deploys a clearly named mock token and a fixture facility, and writes genuine addresses/hashes to `deployments/xrpl-testnet.json`. It does not automatically fund investor wallets or bypass the real 365-day maturity. The automated browser lifecycle is restricted to local chain 31337.
-
-To verify an actual transaction using a local RPC, the XRPL EVM endpoint, or an optional QuickNode URL configured in `.env`:
-
-```sh
-npm run verify:tx -- <transaction-hash>
-```
+The app has no authenticated shared backend, production underwriting, real loan ownership, secondary trading, derivatives exchange, audited custody, live sponsor payments, or public testnet deployment. Browser storage is editable; production needs server authorization, durable reservations, and independently reviewed contracts.
 
 ## Engineering documentation
 
+- [Refactor report and verification](docs/MVP_REFACTOR.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Financial model](docs/FINANCIAL_MODEL.md)
 - [Clearing engine](docs/CLEARING_ENGINE.md)
+- [API contracts and activation requirements](docs/API_CONTRACTS.md)
 - [Assumptions](docs/ASSUMPTIONS.md)
-- [Research and amendment evidence](docs/RESEARCH.md)
 - [Security](docs/SECURITY.md)
-- [Competitive landscape](docs/COMPETITIVE_LANDSCAPE.md)
-- [Sponsor integration status](docs/BOUNTIES.md)
-- [Final engineering handoff](docs/FINAL_HANDOFF.md)
-
-This is a synthetic financial engineering demonstration. It does not transfer ownership of real loans, originate real credit, establish legal compliance, or demonstrate regulatory capital relief.
+- [Sponsor status](docs/BOUNTIES.md)
+- [Historical local-chain handoff](docs/FINAL_HANDOFF.md)

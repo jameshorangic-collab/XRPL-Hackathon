@@ -17,7 +17,7 @@ import type {
 } from "./types";
 const STEP = 100000; // $1,000 in cents: explicit demo clearing precision
 const validMoney = (n: number) => Number.isSafeInteger(n) && n >= 0;
-function offerReason(
+export function offerReason(
   o: Offer,
   p: Portfolio,
   today: string,
@@ -61,7 +61,7 @@ function offerReason(
     return "Sector concentration limit exceeded";
 }
 // Bounded exact dynamic programming over $1,000 allocations. Each offer is used at most once.
-function juniorOptions(
+export function juniorOptions(
   offers: JuniorOffer[],
   maxAmount: number,
 ): Map<number, Allocation[]> {

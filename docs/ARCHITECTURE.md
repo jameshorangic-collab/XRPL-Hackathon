@@ -1,34 +1,54 @@
 # Architecture
 
-## Components
-
-The React/TypeScript application runs on Vite. A browser-only architecture keeps this single-workspace demo easy to run without service credentials. An authenticated server and durable shared database are future work; localStorage is deliberately limited to synthetic demo data.
+BACKSTOP v0.2 uses React 19, TypeScript, and Vite. Exactly four application routes are handled by `src/router.ts` and `src/App.tsx`: signup, borrow, invest, and dashboard. Account creation and role switching are demo conveniences, not authorization.
 
 ```mermaid
 flowchart LR
-  Tape[Synthetic loan tape] --> Domain[Portfolio model]
-  Bids[Editable senior and junior offers] --> Solver[Exact bounded clearing]
-  Domain --> Solver
-  Solver --> Terms[Accepted structure snapshot]
-  Terms --> Browser[Simulated funding tracker]
-  Terms --> Adapter[ethers local chain adapter]
-  Adapter --> Facility[BackstopFacility]
-  Facility --> Claims[Pull-based settlement claims]
-  Terms --> Stress[Principal stress and cash waterfall]
+  Form[Borrower application] --> Repo[Browser repository]
+  Repo --> Job[Persisted underwriting job]
+  Job --> Rules[Deterministic ratios and eligibility]
+  Job -. optional .-> AWS[Trusted AWS explanation gateway]
+  Rules --> Listing[Eligible listing or explicit demo review]
+  Listing --> Bids[Persistent investor quotes]
+  Bids --> Solver[Deterministic clearing]
+  Solver --> Lock[Locked accepted allocations]
+  Lock --> Cash[Simulated funded capital]
+  Cash --> Settlement[One final cash waterfall]
+  Repo -. optional .-> AP4M[Trusted paid-report gateway]
+  Lock -. future verified binding .-> EVM[Wallet adapter and testnet facility]
 ```
 
-`src/domain/` contains typed financial logic, input validation, clearing, and funding transitions. `src/data/seed.ts` supplies synthetic loans and reproducible scenarios. `src/adapters/intelligence.ts` explains computed results without an LLM. `src/chain.ts` sends actual local transactions, records receipts, and checks each distribution against the client model. The chain adapter is loaded only when needed.
+## Boundaries
 
-`contracts/MockUSD.sol` is an unrestricted test token with two decimals. `contracts/BackstopFacility.sol` holds immutable accepted participant allocations, rates, fees, a terms hash, and funding deadline. It disburses the fully funded stack to the originator. The originator reports cash collections by transferring tokens back. After 365 days, settlement allocates claims; participants withdraw independently.
+| Code                                              | Responsibility                                                                                     |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `src/pages/`                                      | Four page components; no secondary routes                                                          |
+| `src/components/`                                 | Profile context, underwriting timeline, investment panel, demo controls, wallet and legacy fixture |
+| `src/data/repository.ts`                          | Versioned localStorage, save-before-publish transactions, browser cross-tab locks and updates      |
+| `src/data/services.ts`                            | Persist job before external work, retry/resume, idempotent completion and report requests          |
+| `src/domain/underwriting.ts`                      | Validated deterministic cash model and listing recommendation                                      |
+| `src/domain/marketplace.ts`                       | Profiles, applications, bids, reservations, commitments and settlements                            |
+| `src/domain/marketFinance.ts`                     | Whole-loan matching, three-tranche clearing, stress and cash waterfall                             |
+| `src/domain/clearing.ts`, `finance.ts`, `deal.ts` | Preserved original senior/junior engine, rounding and legacy lifecycle                             |
+| `src/integrations/`                               | AWS/AP4M/QuickNode server gateways, injected-wallet adapter, truthful status                       |
+| `src/chain.ts`, `contracts/`                      | Preserved genuine local two-layer EVM lifecycle                                                    |
 
-## Data and state
+## Persistent state
 
-Accepted terms are copied so later offer changes cannot alter the accepted structure in normal app use. Editing is disabled after acceptance. The browser can be reset and its storage can be tampered with; it is not an immutable ledger or an authorization system. The Solidity contract is the source of truth for its own deposited funds and claims.
+The version-2 datastore (`backstop-marketplace-v2`) contains users, applications, jobs, assessments, reports, loan listings, portfolios, bids, plans, commitments, transactions, and settlements. The old `backstop-v1` storage is retained. Refresh preserves data; errors loading corrupted data offer an explicit demo reset instead of silently erasing records.
 
-A single accepted browser deal prevents demo capital being allocated to two concurrent structures. On chain, transferred ERC-20 balances cannot simultaneously remain available in an investor's wallet. The automated demo mints fresh test tokens for each isolated run. It does not implement a production multi-deal capital reservation service.
+Bids reserve simulated cash across opportunities. The first commitment freezes selected allocations and closes unselected quotes, releasing excess quote capacity. Commitments debit cash once; final repayment credits actual modeled distributions once. Funding totals count committed investor cash and the separately debited originator contribution, never bid amounts. Portfolio assets and individual listings are disjoint.
 
-## Networks and adapters
+Web Locks serialize writes across tabs where supported. There is no equivalent authoritative multi-user server. Storage is editable, local to an origin/browser, and resettable. Browsers without Web Locks lack cross-tab write serialization. Browser state is not suitable for real capital or personal financial data.
 
-The automated UI wallet flow is restricted to chain 31337 at `127.0.0.1:8545`, uses unlocked local signers, and never reads private keys. It advances time only on that local chain. A testnet deployment script accepts credentials from the local environment and checks chain 1449000. A separate receipt verifier can use QuickNode or another compatible RPC. Neither claims a network transaction before receiving an actual mined receipt.
+## Optional services
 
-BACKSTOP is a standalone EVM facility. It does not create a native XRPL `Loan`, `Vault`, or `LoanBroker`. A future native integration would need an authorized broker, verified amendment support, a compatible asset, and an explicit bridge/custody design. The current funded junior stack cannot simply be relabeled a separate XLS-66 broker reserve without changing the accounting.
+`VITE_API_BASE_URL` points to a future trusted gateway; no backend is included. AWS may explain deterministic facts but cannot replace financial ratios or invent approval. AP4M requests require server budget checks, voucher signing, merchant redemption, and receipt verification before reporting success. QuickNode credentials remain on the server. A missing or failed service does not crash the default demo. See [API_CONTRACTS](API_CONTRACTS.md).
+
+The injected-wallet adapter checks XRPL EVM Testnet chain 1449000. Existing contract terms only support annual senior/junior fixtures; mezzanine and new borrower opportunities are not wired on-chain. A verified opportunity/token/terms binding is required before real funding. Wallet connection alone does not enable live investments.
+
+The optional local fixture uses chain 31337 and a mintable mock token. Its recorded receipts are genuine local transactions with simulated borrower collections. It remains isolated from marketplace balances and cannot run its unlocked-account/time-travel lifecycle on a public network.
+
+## Hosting
+
+`npm run build` typechecks and emits static assets plus route HTML shells. `vercel.json` supplies Vite/output and route rewrites for a future repository deployment. The existing Vercel project uses manually uploaded `dist/` artifacts and does not run a database, integration gateway, or Hardhat node.

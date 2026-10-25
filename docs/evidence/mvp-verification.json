@@ -1,0 +1,60 @@
+{
+  "verifiedAtUTC": "2026-10-25T15:13:24.596797+00:00",
+  "branch": "feat/four-page-mvp",
+  "applicationTests": 83,
+  "preservedOriginalTests": 23,
+  "contractTests": 14,
+  "lint": "passed",
+  "typecheck": "passed via tsc -b",
+  "build": "passed",
+  "runtimeVulnerabilities": 0,
+  "developmentVulnerabilities": {
+    "low": 19,
+    "moderate": 10,
+    "high": 18,
+    "critical": 0
+  },
+  "browser": {
+    "manual": true,
+    "coreJourney": "borrower signup -> $10000 application -> deterministic assessment -> listing -> investor signup -> bid -> separate simulated commitment -> refresh -> dashboard -> final simulated repayment",
+    "portfolio": "senior 80000 at7.9%, mezzanine10000 at11.9%, junior5000 at15.9%, retained5000; projected cost8880.37; committed and settled severe default",
+    "severeDefault": {
+      "collections": 70000,
+      "fee": 350,
+      "seniorInterest": 6320,
+      "seniorPrincipal": 63330,
+      "mezzaninePaid": 0,
+      "juniorPaid": 0,
+      "reconciliation": 0
+    },
+    "reviewGate": "not listed until explicit synthetic operator reason",
+    "controls": [
+      "example borrower",
+      "example investor",
+      "add synthetic loan",
+      "load diversified portfolio",
+      "run clearing",
+      "fund selected simulation",
+      "performing",
+      "moderate default",
+      "severe default",
+      "final settlement",
+      "reset"
+    ],
+    "mobile": {
+      "viewport": 390,
+      "documentWidth": 390,
+      "pages": [
+        "signup",
+        "borrow",
+        "invest",
+        "dashboard"
+      ]
+    },
+    "persistence": "application, assessment, report, bids and commitments survived refresh",
+    "invalidInput": "native form required-field validation and duplicate application rejection"
+  },
+  "liveIntegrationsInvoked": [],
+  "walletRejection": "unit-tested fake EIP1193 eth_sendTransaction rejection; no actual wallet submission",
+  "legacyChainEvidence": "historical local-chain-browser-run.json; no public testnet deployment"
+}

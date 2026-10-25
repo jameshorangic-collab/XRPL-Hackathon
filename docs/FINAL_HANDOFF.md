@@ -1,3 +1,5 @@
+> Historical v0.1 handoff. The current four-page v0.2 app, test counts, and limitations are documented in [MVP_REFACTOR.md](MVP_REFACTOR.md). The local-chain evidence below remains historical evidence of the preserved two-layer fixture.
+
 # Final engineering handoff
 
 Built October 24, 2026, for the BACKSTOP hackathon proof of concept.

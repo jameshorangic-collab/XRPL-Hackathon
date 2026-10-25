@@ -1,33 +1,20 @@
-# Judge demonstration
+# Four-page demo walkthrough
 
-## Start locally
+Run `npm ci` and `npm run dev`, or open https://backstop-xrpl.vercel.app. New visitors start at `/signup`. Every figure is synthetic; no wallet is needed.
 
-Run `npm ci`, `npm run contracts:compile`, then `npm run demo`. Open the printed Local URL. No wallet extension, credentials, faucet, external AI, or sponsor service is needed. Reset the demonstration before presenting. Initial quote evaluation is frozen to October 24, 2026.
+1. Create a borrower demo profile with a synthetic name/email. Request Loan opens.
+2. Click **Fill synthetic example** and **Submit for Underwriting**. The saved $10,000 Alder Design Studio application shows its unique ID and underwriting timeline. Deterministic ratios yield $9,000 available cash, a $933.34 monthly reserve, and 9.64× coverage. It is eligible and listed. No AI was invoked.
+3. **View synthetic report** explicitly shows no payment; AP4M remains unconfigured. Refresh and confirm the application persists.
+4. Account → create a separate investor profile. Invest → Alder → **View / Invest**. Submit a $10,000 whole-loan bid at 8%. Clearing becomes feasible; funded capital is still zero.
+5. Separately click **Commit Funding · simulated**. Funding becomes $10,000/$10,000. Dashboard records the position and a simulated transaction with no hash. Refresh preserves the investment.
+6. Dashboard → expand **Development / demo controls**. Choose Alder, leave Performing selected, and **Simulate final repayment / default**. The full $10,800 is credited once. Further final settlement is disabled.
+7. **Load diversified portfolio** adds reproducible competing senior/mezzanine/junior bids. Invest → Loan Portfolios → view the pool. Selected capital is $80k senior / $10k mezzanine / $5k junior / $5k retained. Projected funding cost is $8,975.37. Funded progress counts commitments, not quotes.
+8. In the separate demo controls, **Fund selected bids · simulation** debits each synthetic profile and originator. Test Moderate or Severe default previews, then record final simulated settlement once. Cash reconciles, with fees and senior/mezzanine coupons ahead of lower-ranked payouts.
 
-## Three-minute walkthrough
+For competition, submit your own senior $80k at 7.9%, mezzanine $10k at 11.9%, and junior $5k at 15.9% before any commitment. All fit a fresh $100k simulated investor balance and beat fixture quotes, reducing projected cost to $8,880.37. Commit each individually, then fund the retained contribution using the labeled demo control.
 
-**0:00–0:25 — Problem.** Open Overview with **Unfunded portfolio**. A $100,000 pool has $5,000 retained capital and competing senior quotes, but it lacks enough funded junior risk capital. Run clearing. Show the explicit failure result.
+For the review gate, submit a different synthetic business with only 0.5 years operating history. It stays Needs review and does not appear in Invest. Dashboard demo controls require selecting that application and entering an approval reason of at least ten characters before explicit demo approval can list it. The underlying assessment remains Needs review. Declined applications cannot use this bypass.
 
-**0:25–0:55 — Marketplace.** Select **Competitive market**. Open Order book: two senior quotes and multiple junior bids. Point out Urban Property Fund's asset-class exclusion. Open Harbor's offer to show that rate and offered amount can be changed or withdrawn before acceptance.
+Load example borrower/investor controls switch to reusable fixture profiles. Add synthetic loan publishes a labeled demo fixture. Reset demo state clears only this origin's v2 demo data and returns to signup; the old v1 prototype data is retained.
 
-**0:55–1:30 — Formation.** Run clearing. Northstar supplies $80,000, Harbor $10,000, Cobalt a $5,000 partial fill, and the originator $5,000. Cost is $9,500.37 for the modeled year, approximately 9.50% of portfolio principal. Show the enhancement requirement, exact funding identity, and alternatives. Select **Better junior pricing** and reclear: Granite's 12.5% bid lowers projected cost by $650. Reload Competitive market before accepting the main example.
-
-**1:30–2:05 — Commitment and chain.** Accept the structure. Click one mock commitment and show activation blocked. Commit the rest. Clearly identify this browser tracker as a simulation. Execute local lifecycle to send genuine EVM transactions; the script advances only local-chain time to maturity. Show the facility address and mined hashes. If the machine is slow, use the retained JSON evidence and explain that it records a prior local run rather than a testnet deployment.
-
-**2:05–2:40 — Risk.** Open Risk waterfall. At 85% principal recovery, retained $5,000 is gone, junior loses $10,000, and senior principal remains whole. At 70%, junior and retention are exhausted, and senior loses $10,000. Explain that this chart excludes fees/coupons. Scroll to full cash accounting to show their actual priority and cent reconciliation.
-
-**2:40–3:00 — Close.** BACKSTOP demonstrates automated matching of funding and risk-bearing capital for smaller originators. It is a synthetic standalone EVM prototype; real underwriting, asset ownership, investor onboarding, and public testnet integrations remain future work.
-
-## Thirty-second pitch
-
-Small-business originators need both financing and investors willing to hold different layers of credit risk. BACKSTOP lets senior and junior investors compete with explicit prices and constraints, clears the lowest-cost feasible funded stack, and records a deterministic settlement waterfall. The demo turns an unfunded $100,000 portfolio into a financeable structure without inventing quotes or guaranteeing junior returns.
-
-## Failure-resistant controls
-
-- **Unfunded portfolio** and **Capital shortfall** fail honestly.
-- **Expensive capital** shows that costly junior capital does not mechanically make financing cheaper.
-- **Better junior pricing** shows a winning bid and $650 economic change.
-- **Portfolio analytics** discloses the synthetic loan tape and assumed PD/LGD.
-- **Origination → Edit / load loan tape** creates a different synthetic portfolio from validated JSON.
-- **Export summary** downloads terms, offers, commitments, and any chain evidence held in that page session.
-- Browser state survives reload. Chain evidence in the page should be exported before switching scenarios or closing the tab. Local chain state disappears when the node stops; saved receipt evidence remains labeled historical/local.
+The Dashboard developer tool preserves the original genuine local senior/junior EVM fixture. Run `npm run contracts:compile` then `npm run demo` locally to use it. Its transactions and time travel are restricted to loopback chain 31337; it does not fund the new simulated marketplace positions. It uses a mock USD token, not RLUSD. No real wallet transaction or external payment is needed for the four-page demo.
