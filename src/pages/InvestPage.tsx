@@ -59,7 +59,8 @@ export default function InvestPage() {
             ? "Individual loan marketplace"
             : "Portfolio marketplace"
         }
-        className="opportunity-grid"
+        className="opportunity-grid tab-enter"
+        key={tab}
       >
         {tab === "loans" ? (
           loans.length ? (

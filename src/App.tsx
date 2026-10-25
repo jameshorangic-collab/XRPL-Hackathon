@@ -9,6 +9,7 @@ import { switchProfileRole } from "./domain/marketplace";
 import { storageKey } from "./data/repository";
 import { createSeedState } from "./data/marketSeed";
 import IntegrationWalletBridge from "./components/IntegrationWalletBridge";
+import LiquidBackground from "./components/LiquidBackground";
 class StartupBoundary extends Component<
   { children: ReactNode },
   { error: string }
@@ -72,6 +73,7 @@ function Application() {
     });
   return (
     <>
+      <LiquidBackground />
       <header className="app-header">
         <a
           className="brand"
@@ -141,15 +143,17 @@ function Application() {
         simulated. Demo profiles are not secure authentication.
       </p>
       <IntegrationWalletBridge />
-      {!user || route === "/signup" ? (
-        <SignupPage />
-      ) : route === "/borrow" ? (
-        <BorrowPage />
-      ) : route === "/invest" ? (
-        <InvestPage />
-      ) : (
-        <DashboardPage />
-      )}
+      <div className="page-transition" key={user ? route : "/signup"}>
+        {!user || route === "/signup" ? (
+          <SignupPage />
+        ) : route === "/borrow" ? (
+          <BorrowPage />
+        ) : route === "/invest" ? (
+          <InvestPage />
+        ) : (
+          <DashboardPage />
+        )}
+      </div>
       <footer>
         BACKSTOP · Hackathon prototype · Browser data persists on this device
       </footer>
