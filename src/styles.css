@@ -1,14 +1,24 @@
-/* BACKSTOP design system — warm neutral surfaces, forest-green primary. */
+/* Libre Franklin is the open fallback when Franklin Gothic is not installed. */
+@import url("https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700&display=swap");
+/* BACKSTOP design system — tan ombre background, dark-green banner, sharp edges. */
 :root {
-  --bg: #f7f6f2;
-  --surface: #ffffff;
-  --surface-2: #fbfaf7;
-  --ink: #15211b;
-  --ink-2: #3c4a43;
-  --muted: #6b7770;
-  --faint: #929c96;
-  --border: #e5e3dc;
-  --border-strong: #d4d2c9;
+  --font-body:
+    "Franklin Gothic Book", "Libre Franklin", "Franklin Gothic", Arial,
+    sans-serif;
+  --font-strong:
+    "Franklin Gothic Demi", "Franklin Gothic Medium", "Libre Franklin", Arial,
+    sans-serif;
+  --bg: #e9dcc3;
+  --surface: #fffdf8;
+  --surface-2: #f8f2e6;
+  --ink: #111814;
+  --ink-2: #141a16;
+  --muted: #1c211e;
+  --faint: #262b28;
+  --border: #ddd1ba;
+  --border-strong: #c7b99c;
+  --banner: #17352a;
+  --banner-ink: #f4efe3;
   --primary: #1d4a37;
   --primary-hover: #163a2b;
   --primary-soft: #e9f0ec;
@@ -26,19 +36,12 @@
   --info-bg: #eef2f7;
   --info-ink: #3b5470;
   --info-border: #d7e0ea;
-  --radius: 10px;
-  --radius-sm: 7px;
+  --radius: 0;
+  --radius-sm: 0;
   --shadow: 0 1px 2px rgba(21, 33, 27, 0.04), 0 1px 1px rgba(21, 33, 27, 0.03);
   --shadow-lg:
     0 8px 28px rgba(21, 33, 27, 0.08), 0 2px 6px rgba(21, 33, 27, 0.04);
-  font-family:
-    Inter,
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  font-family: var(--font-body);
   color: var(--ink);
   background: var(--bg);
   font-synthesis: none;
@@ -1803,4 +1806,211 @@ details.panel > summary {
   .demo-controls .form-row {
     grid-template-columns: 1fr 1fr;
   }
+}
+
+/* ===================== Theme: tan ombre, green banner, sharp ===================== */
+
+/* Ombre tan background with a faint diagonal weave. */
+html,
+body {
+  background-color: var(--bg);
+}
+body {
+  min-height: 100vh;
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      rgba(110, 82, 40, 0.035) 0 1px,
+      transparent 1px 10px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(110, 82, 40, 0.025) 0 1px,
+      transparent 1px 10px
+    ),
+    linear-gradient(180deg, #f5eddc 0%, #ebdec4 40%, #dcc8a3 100%);
+  background-attachment: fixed;
+}
+
+/* Typography: Franklin Gothic Book for text, Demi for emphasis. */
+h1,
+h2,
+h3,
+h4,
+strong,
+b,
+th,
+legend,
+button,
+.brand,
+.eyebrow,
+.badge,
+.status-pill,
+.tabs button,
+.app-header nav a,
+.form-section > h3,
+.tranche-name,
+.tranche-priority,
+.business,
+.stat strong,
+.detail-grid strong,
+.assessment-summary strong,
+.summary-card dd,
+.summary-card h4,
+.step-label,
+.step-number,
+.tools-heading {
+  font-family: var(--font-strong);
+  font-weight: 400;
+}
+h1 {
+  letter-spacing: -0.01em;
+}
+label,
+.field-hint,
+.small,
+.muted,
+td,
+td small,
+.stat span,
+.detail-grid span,
+.assessment-summary span,
+.assessment-summary small,
+.timeline p,
+.funding > div,
+.footnote,
+footer,
+.demo-banner,
+.profile-bar {
+  color: var(--ink);
+}
+input::placeholder,
+textarea::placeholder {
+  color: #85796a;
+}
+
+/* Dark green banner. */
+.app-header {
+  background: var(--banner);
+  border-bottom: 3px solid #c9b48a;
+}
+.brand {
+  color: var(--banner-ink);
+  letter-spacing: 0.14em;
+}
+.brand-mark {
+  background: var(--banner-ink);
+  border-radius: 0;
+}
+.brand-mark span {
+  border-color: var(--banner);
+  border-top-color: transparent;
+  border-radius: 0;
+}
+.app-header nav {
+  align-self: stretch;
+}
+.app-header nav a {
+  display: flex;
+  align-items: center;
+  color: rgba(244, 239, 227, 0.82);
+  border-radius: 0;
+  padding: 0 16px;
+  min-height: 64px;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -3px;
+  letter-spacing: 0.02em;
+}
+.app-header nav a:hover:not([aria-current="page"]) {
+  background: rgba(244, 239, 227, 0.08);
+  color: #fff;
+}
+.app-header nav a[aria-current="page"] {
+  color: #fff;
+  background: rgba(244, 239, 227, 0.1);
+  border-bottom-color: var(--banner-ink);
+}
+.demo-label {
+  background: transparent;
+  color: var(--banner-ink);
+  border: 1px solid rgba(244, 239, 227, 0.55);
+  border-radius: 0;
+  letter-spacing: 0.04em;
+}
+
+/* Sharp selectable tabs. */
+.tabs {
+  display: flex;
+  gap: 0;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  border-bottom: 2px solid var(--primary);
+}
+.tabs button {
+  border-radius: 0;
+  border: 1px solid var(--primary);
+  border-bottom: 0;
+  margin-right: -1px;
+  background: var(--surface);
+  color: var(--primary);
+  padding: 11px 20px;
+  letter-spacing: 0.02em;
+}
+.tabs button:hover:not(:disabled) {
+  background: var(--surface-2);
+  border: 1px solid var(--primary);
+  border-bottom: 0;
+}
+.tabs button[aria-selected="true"],
+.tabs button[aria-selected="true"]:hover:not(:disabled) {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: none;
+}
+.tabs span {
+  border-radius: 0;
+  background: rgba(29, 74, 55, 0.1);
+}
+.tabs button[aria-selected="true"] span {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Square everything else that was rounded (circles stay round). */
+.signup-card,
+.badge,
+.risk-meter i,
+.funding progress {
+  border-radius: 0;
+}
+.funding progress::-webkit-progress-bar,
+.funding progress::-webkit-progress-value,
+.funding progress::-moz-progress-bar {
+  border-radius: 0;
+}
+.panel,
+.stat,
+.signup-card {
+  border-color: var(--border);
+}
+@media (max-width: 850px) {
+  .app-header nav a {
+    min-height: 46px;
+  }
+}
+@media (max-width: 600px) {
+  .tabs button {
+    padding: 10px 8px;
+  }
+}
+.role-card {
+  font-family: var(--font-strong);
+  font-weight: 400;
+}
+.role-card small {
+  font-family: var(--font-body);
+  color: var(--ink);
+}
+.role-card .role-icon {
+  border-radius: 0;
 }
