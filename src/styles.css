@@ -1,6 +1,6 @@
 /* Libre Franklin is the open fallback when Franklin Gothic is not installed. */
 @import url("https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700&display=swap");
-/* BACKSTOP design system — tan ombre background, dark-green banner, sharp edges. */
+/* BACKSTOP design system — atmospheric blue palette (Pantone-inspired), classic ombre, rounded. */
 :root {
   --font-body:
     "Franklin Gothic Book", "Libre Franklin", "Franklin Gothic", Arial,
@@ -8,22 +8,22 @@
   --font-strong:
     "Franklin Gothic Demi", "Franklin Gothic Medium", "Libre Franklin", Arial,
     sans-serif;
-  --bg: #e9dcc3;
-  --surface: #fffdf8;
-  --surface-2: #f8f2e6;
-  --ink: #111814;
-  --ink-2: #141a16;
-  --muted: #1c211e;
-  --faint: #262b28;
-  --border: #ddd1ba;
-  --border-strong: #c7b99c;
-  --banner: #17352a;
-  --banner-ink: #f4efe3;
-  --primary: #1d4a37;
-  --primary-hover: #163a2b;
-  --primary-soft: #e9f0ec;
-  --primary-ring: #9cbcab;
-  --accent: #4f7d64;
+  --bg: #d9e4ef;
+  --surface: #ffffff;
+  --surface-2: #f2f6fb;
+  --ink: #0a1320;
+  --ink-2: #0e1826;
+  --muted: #131d2b;
+  --faint: #1d2735;
+  --border: #b9c7d6;
+  --border-strong: #93a6ba;
+  --banner: #0e2a47;
+  --banner-ink: #f2f6fb;
+  --primary: #0f4c81;
+  --primary-hover: #0a3a64;
+  --primary-soft: #e1ebf6;
+  --primary-ring: #7fa6cf;
+  --accent: #3d73a8;
   --good-bg: #ebf4ee;
   --good-ink: #23613f;
   --good-border: #cfe3d6;
@@ -36,8 +36,8 @@
   --info-bg: #eef2f7;
   --info-ink: #3b5470;
   --info-border: #d7e0ea;
-  --radius: 0;
-  --radius-sm: 0;
+  --radius: 10px;
+  --radius-sm: 7px;
   --shadow: 0 1px 2px rgba(21, 33, 27, 0.04), 0 1px 1px rgba(21, 33, 27, 0.03);
   --shadow-lg:
     0 8px 28px rgba(21, 33, 27, 0.08), 0 2px 6px rgba(21, 33, 27, 0.04);
@@ -1808,31 +1808,59 @@ details.panel > summary {
   }
 }
 
-/* ===================== Theme: tan ombre, green banner, sharp ===================== */
+/* ============ Theme: atmospheric palette, classic ombre, rounded, high contrast ============ */
 
-/* Ombre tan background with a faint diagonal weave. */
+/* Classic vertical ombre: pale sky at the top deepening to dusk blue. */
 html,
 body {
   background-color: var(--bg);
 }
 body {
   min-height: 100vh;
-  background-image:
-    repeating-linear-gradient(
-      45deg,
-      rgba(110, 82, 40, 0.035) 0 1px,
-      transparent 1px 10px
-    ),
-    repeating-linear-gradient(
-      -45deg,
-      rgba(110, 82, 40, 0.025) 0 1px,
-      transparent 1px 10px
-    ),
-    linear-gradient(180deg, #f5eddc 0%, #ebdec4 40%, #dcc8a3 100%);
+  background-image: linear-gradient(
+    180deg,
+    #f4f7fb 0%,
+    #dce7f2 45%,
+    #b4c8de 100%
+  );
   background-attachment: fixed;
 }
 
-/* Typography: Franklin Gothic Book for text, Demi for emphasis. */
+/* Higher contrast surfaces. */
+:root {
+  --shadow: 0 1px 2px rgba(10, 19, 32, 0.08), 0 1px 1px rgba(10, 19, 32, 0.05);
+  --shadow-lg:
+    0 10px 30px rgba(10, 19, 32, 0.14), 0 2px 6px rgba(10, 19, 32, 0.08);
+  --info-bg: #e4edf7;
+  --info-ink: #123a63;
+  --info-border: #a9c0d8;
+  --good-ink: #17542f;
+  --good-border: #a9d1b7;
+  --warn-ink: #6b4d06;
+  --warn-border: #e2c886;
+  --bad-ink: #85301b;
+  --bad-border: #e3b4a4;
+}
+.panel,
+.stat,
+.signup-card {
+  border-color: var(--border);
+}
+.badge {
+  background: #e8eef5;
+  border-color: var(--border);
+  color: var(--ink);
+}
+th {
+  background: #eaf0f7;
+  color: var(--ink);
+  border-bottom-color: var(--border);
+}
+td {
+  border-bottom-color: #d6dfe9;
+}
+
+/* Typography: Franklin Gothic Book for text, Demi for emphasis; text in near-black. */
 h1,
 h2,
 h3,
@@ -1846,6 +1874,7 @@ button,
 .eyebrow,
 .badge,
 .status-pill,
+.role-card,
 .tabs button,
 .app-header nav a,
 .form-section > h3,
@@ -1863,9 +1892,6 @@ button,
   font-family: var(--font-strong);
   font-weight: 400;
 }
-h1 {
-  letter-spacing: -0.01em;
-}
 label,
 .field-hint,
 .small,
@@ -1873,6 +1899,7 @@ label,
 td,
 td small,
 .stat span,
+.stat small,
 .detail-grid span,
 .assessment-summary span,
 .assessment-summary small,
@@ -1881,136 +1908,117 @@ td small,
 .footnote,
 footer,
 .demo-banner,
-.profile-bar {
+.profile-bar,
+.role-card small,
+.tranche-card .tranche-meta,
+.summary-card dt {
   color: var(--ink);
+}
+.role-card small {
+  font-family: var(--font-body);
 }
 input::placeholder,
 textarea::placeholder {
-  color: #85796a;
+  color: #6f7d8c;
+}
+.eyebrow {
+  color: var(--primary);
 }
 
-/* Dark green banner. */
+/* Deep navy banner. */
 .app-header {
   background: var(--banner);
-  border-bottom: 3px solid #c9b48a;
+  border-bottom: 0;
+  box-shadow: 0 2px 10px rgba(10, 19, 32, 0.25);
 }
 .brand {
   color: var(--banner-ink);
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
 }
 .brand-mark {
   background: var(--banner-ink);
-  border-radius: 0;
 }
 .brand-mark span {
   border-color: var(--banner);
   border-top-color: transparent;
-  border-radius: 0;
-}
-.app-header nav {
-  align-self: stretch;
 }
 .app-header nav a {
-  display: flex;
-  align-items: center;
-  color: rgba(244, 239, 227, 0.82);
-  border-radius: 0;
-  padding: 0 16px;
-  min-height: 64px;
-  border-bottom: 3px solid transparent;
-  margin-bottom: -3px;
-  letter-spacing: 0.02em;
+  color: rgba(242, 246, 251, 0.85);
 }
 .app-header nav a:hover:not([aria-current="page"]) {
-  background: rgba(244, 239, 227, 0.08);
+  background: rgba(242, 246, 251, 0.1);
   color: #fff;
 }
 .app-header nav a[aria-current="page"] {
-  color: #fff;
-  background: rgba(244, 239, 227, 0.1);
-  border-bottom-color: var(--banner-ink);
+  color: var(--banner);
+  background: var(--banner-ink);
 }
 .demo-label {
-  background: transparent;
+  background: rgba(242, 246, 251, 0.12);
   color: var(--banner-ink);
-  border: 1px solid rgba(244, 239, 227, 0.55);
-  border-radius: 0;
-  letter-spacing: 0.04em;
+  border-color: rgba(242, 246, 251, 0.45);
 }
 
-/* Sharp selectable tabs. */
+/* Rounded segmented tabs with a strong selected state. */
 .tabs {
-  display: flex;
-  gap: 0;
-  padding: 0;
-  background: transparent;
-  border-radius: 0;
-  border-bottom: 2px solid var(--primary);
+  background: #c9d7e6;
+  border: 1px solid var(--border-strong);
 }
 .tabs button {
-  border-radius: 0;
-  border: 1px solid var(--primary);
-  border-bottom: 0;
-  margin-right: -1px;
-  background: var(--surface);
-  color: var(--primary);
-  padding: 11px 20px;
-  letter-spacing: 0.02em;
-}
-.tabs button:hover:not(:disabled) {
-  background: var(--surface-2);
-  border: 1px solid var(--primary);
-  border-bottom: 0;
-}
-.tabs button[aria-selected="true"],
-.tabs button[aria-selected="true"]:hover:not(:disabled) {
-  background: var(--primary);
-  color: #fff;
-  box-shadow: none;
-}
-.tabs span {
-  border-radius: 0;
-  background: rgba(29, 74, 55, 0.1);
-}
-.tabs button[aria-selected="true"] span {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* Square everything else that was rounded (circles stay round). */
-.signup-card,
-.badge,
-.risk-meter i,
-.funding progress {
-  border-radius: 0;
-}
-.funding progress::-webkit-progress-bar,
-.funding progress::-webkit-progress-value,
-.funding progress::-moz-progress-bar {
-  border-radius: 0;
-}
-.panel,
-.stat,
-.signup-card {
-  border-color: var(--border);
-}
-@media (max-width: 850px) {
-  .app-header nav a {
-    min-height: 46px;
-  }
-}
-@media (max-width: 600px) {
-  .tabs button {
-    padding: 10px 8px;
-  }
-}
-.role-card {
-  font-family: var(--font-strong);
-  font-weight: 400;
-}
-.role-card small {
-  font-family: var(--font-body);
   color: var(--ink);
 }
-.role-card .role-icon {
-  border-radius: 0;
+.tabs button[aria-selected="true"] {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(10, 19, 32, 0.25);
+}
+.tabs button[aria-selected="true"] span {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Blue selection states (replacing the earlier green tints). */
+input:focus,
+select:focus,
+textarea:focus {
+  box-shadow: 0 0 0 3px rgba(15, 76, 129, 0.2);
+}
+.role-card:has(input:checked),
+.tranche-card[aria-pressed="true"] {
+  background: #edf3fa;
+  box-shadow: 0 0 0 3px rgba(15, 76, 129, 0.14);
+}
+.opportunity-grid .panel.selected {
+  box-shadow: 0 0 0 3px rgba(15, 76, 129, 0.16);
+}
+.market-table tr.selected td {
+  background: #edf3fa;
+}
+.market-table tbody tr:hover td {
+  background: #f2f6fb;
+}
+.timeline li.complete:not(:last-child):before {
+  background: #9db7d3;
+}
+.funding progress {
+  background: #d3deea;
+}
+.funding progress::-webkit-progress-bar {
+  background: #d3deea;
+}
+.investment-panel {
+  border-color: var(--border-strong);
+}
+.demo-controls {
+  background: #fbfcfe;
+  border-color: var(--border-strong);
+}
+/* Tranche cards are buttons; keep their body copy in the text face. */
+.tranche-card,
+.tranche-card .tranche-meta,
+.tranche-card .tranche-figures span {
+  font-family: var(--font-body);
+}
+.tranche-card .tranche-figures b {
+  font-family: var(--font-strong);
+  font-weight: 400;
 }
