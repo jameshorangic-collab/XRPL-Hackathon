@@ -73,11 +73,33 @@ function Application() {
     sync();
     return () => observer.disconnect();
   }, []);
+  // Hide the banner while scrolling down; bring it back on any scroll up.
+  useEffect(() => {
+    const root = document.documentElement;
+    let last = window.scrollY;
+    let frame = 0;
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        const y = window.scrollY;
+        if (y < 80) root.dataset.header = "shown";
+        else if (Math.abs(y - last) > 6)
+          root.dataset.header = y > last ? "hidden" : "shown";
+        last = y;
+        frame = 0;
+      });
+    };
+    root.dataset.header = "shown";
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(frame);
+    };
+  }, []);
   const links: [Route, string][] = [
     ["/borrow", "Request Loan"],
     ["/invest", "Invest"],
     ["/dashboard", "Dashboard"],
-    ["/signup", "Account"],
   ];
   return (
     <>
@@ -114,16 +136,31 @@ function Application() {
         )}
         <div className="header-end">
           <span className="demo-label">Synthetic demo</span>
+          {user && (
+            <a
+              className="account-link"
+              href="/signup"
+              aria-current={route === "/signup" ? "page" : undefined}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/signup");
+              }}
+            >
+              <span className="avatar" aria-hidden="true">
+                {user.name.trim().charAt(0).toUpperCase() || "?"}
+              </span>
+              <span className="account-text">
+                <span className="account-name">{user.name}</span>
+                <span className="account-role">
+                  Account · {user.role === "borrower" ? "Borrower" : "Investor"}
+                </span>
+              </span>
+            </a>
+          )}
         </div>
       </header>
       {user && (
         <div className="profile-bar">
-          <span>
-            <span className="avatar" aria-hidden="true">
-              {user.name.trim().charAt(0).toUpperCase() || "?"}
-            </span>
-            Signed in as <strong>{user.name}</strong>
-          </span>
           <label>
             Viewing as
             <select
