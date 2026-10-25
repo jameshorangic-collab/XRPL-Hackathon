@@ -193,6 +193,7 @@ textarea {
   color: var(--ink);
   width: 100%;
   font-size: 14px;
+  font-weight: 400;
   min-width: 0;
   transition:
     border-color 0.12s,
@@ -1734,4 +1735,18 @@ footer {
     font-size: 12px;
     padding: 8px;
   }
+}
+.table-scroll > p {
+  margin: 0;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+}
+.stats + .small {
+  margin: -8px 0 20px;
+}
+.integration-grid + p {
+  margin-top: 14px;
+}
+.investment-panel > .section-heading {
+  flex-wrap: nowrap;
 }

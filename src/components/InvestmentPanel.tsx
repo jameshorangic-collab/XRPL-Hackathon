@@ -259,7 +259,7 @@ export default function InvestmentPanel({
                     <dl className="tranche-data">
                       <div>
                         <dt>Indicative coupon cap</dt>
-                        <dd>{percent(listing.loan.couponBps)}</dd>
+                        <dd>{percent(listing.loan.couponBps)} / yr</dd>
                       </div>
                       <div>
                         <dt>Bids in book</dt>
