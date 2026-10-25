@@ -15,12 +15,55 @@ import {
   FundingProgress,
   money,
   percent,
+  StatusPill,
   StructureTable,
   StressTable,
   title,
 } from "./ui";
+import { trancheTotal } from "../domain/marketFinance";
 import type { Tranche } from "../domain/marketTypes";
 import { navigate } from "../router";
+const trancheInfo: Record<
+  "senior" | "mezzanine" | "junior",
+  { priority: string; meta: string; risk: number; riskLabel: string }
+> = {
+  senior: {
+    priority: "1st repayment priority",
+    meta: "Paid before mezzanine and junior. Lower relative risk and indicative return — not risk-free.",
+    risk: 1,
+    riskLabel: "Lower relative risk",
+  },
+  mezzanine: {
+    priority: "2nd repayment priority",
+    meta: "Paid after senior, before junior. Intermediate risk and indicative return.",
+    risk: 2,
+    riskLabel: "Intermediate risk",
+  },
+  junior: {
+    priority: "3rd repayment priority",
+    meta: "Absorbs losses after the originator's retained first loss. Higher potential return; returns are not guaranteed.",
+    risk: 3,
+    riskLabel: "Higher risk",
+  },
+};
+function RiskMeter({ level }: { level: number }) {
+  return (
+    <span
+      className={`risk-meter ${level === 3 ? "high" : ""}`}
+      aria-hidden="true"
+    >
+      {[1, 2, 3].map((n) => (
+        <i key={n} className={n <= level ? "on" : ""} />
+      ))}
+    </span>
+  );
+}
+const rateRange = (rates: number[]) => {
+  if (!rates.length) return "—";
+  const lo = Math.min(...rates);
+  const hi = Math.max(...rates);
+  return lo === hi ? percent(lo) : `${percent(lo)}–${percent(hi)}`;
+};
 export default function InvestmentPanel({
   opportunityId: id,
   close,
@@ -28,7 +71,7 @@ export default function InvestmentPanel({
   opportunityId: string;
   close: () => void;
 }) {
-  const { state, repository, action, busy } = useApp();
+  const { state, repository, action, busy, statuses } = useApp();
   const portfolio = state.portfolios[id];
   const listing = state.loans[id];
   const plan = state.plans[id];
@@ -55,6 +98,8 @@ export default function InvestmentPanel({
     (b) =>
       b.opportunityId === id && !["withdrawn", "closed"].includes(b.status),
   );
+  const settled = !!state.settlements[id];
+  const xrpl = statuses.find((s) => s.id === "xrpl");
   const changeTranche = (t: Tranche) => {
     setTranche(t);
     setYieldPct(t === "mezzanine" ? 12 : t === "junior" ? 16 : 8);
@@ -75,6 +120,10 @@ export default function InvestmentPanel({
       "Bid saved. Capital clearing recalculated.",
     );
   }
+  const locked = !!plan?.locked;
+  const positionBid = myBids.find(
+    (b) => b.tranche === tranche && !["withdrawn", "closed"].includes(b.status),
+  );
   return (
     <section
       className="panel investment-panel"
@@ -83,18 +132,22 @@ export default function InvestmentPanel({
       <div className="section-heading">
         <div>
           <span className="eyebrow">
-            {portfolio ? "PORTFOLIO" : "INDIVIDUAL LOAN"}
+            {portfolio ? "Portfolio" : "Individual loan · whole-loan"}
           </span>
           <h2 id="investment-title">
             {portfolio?.name ?? listing.loan.business}
           </h2>
+          <p className="small muted">
+            {portfolio
+              ? `${portfolio.terms.loans.length} businesses · ${new Set(portfolio.terms.loans.map((l) => l.sector)).size} industries`
+              : `${listing.loan.sector} · ${listing.loan.grade}`}
+          </p>
         </div>
         <button onClick={close} aria-label="Close investment panel">
           Close
         </button>
       </div>
-      <FundingProgress state={state} id={id} />
-      <div className="detail-grid">
+      <div className="detail-grid four">
         <p>
           <span>Principal</span>
           <strong>{money(principal)}</strong>
@@ -110,72 +163,112 @@ export default function InvestmentPanel({
           <strong>{money(principal - commitmentTotal(state, id))}</strong>
         </p>
         <p>
-          <span>Your available bid balance</span>
+          <span>Your available balance</span>
           <strong>{money(availableToBid(state, current.id))}</strong>
         </p>
       </div>
+      <FundingProgress state={state} id={id} />
       {!portfolio && (
         <p className="callout small">
-          Whole-loan investing only. This is one business exposure; it does not
-          provide portfolio diversification. The indicative coupon cap is{" "}
-          {percent(listing.loan.couponBps)}. The accepted borrowing cost comes
-          from selected bids.
+          Whole-loan investing only: one business exposure, no portfolio
+          diversification. The indicative coupon ceiling is{" "}
+          {percent(listing.loan.couponBps)} per year; the accepted borrowing
+          cost comes from selected bids.
         </p>
       )}
+
       <div className="subsection">
-        <h3>1. Submit a bid</h3>
+        <h3>
+          <span className="step-label">1</span>
+          {portfolio ? "Choose a position and submit a bid" : "Submit a bid"}
+        </h3>
         <p className="small muted">
-          Propose capital and annual simple yield. A bid reserves demo buying
-          capacity, but is not a funding commitment.
+          A bid reserves part of your simulated balance. It is not a funding
+          commitment.
         </p>
-        <form onSubmit={submit}>
-          <div className="form-row">
-            <label>
-              Position
-              <select
-                value={tranche}
-                onChange={(e) => changeTranche(e.target.value as Tranche)}
-                disabled={!!plan?.locked}
-              >
-                {portfolio ? (
-                  <>
-                    <option value="senior">Senior · first paid</option>
-                    <option value="mezzanine">Mezzanine · after senior</option>
-                    <option value="junior">Junior · after mezzanine</option>
-                  </>
-                ) : (
-                  <option value="whole">Whole loan</option>
-                )}
-              </select>
-            </label>
-            <label>
-              Proposed investment ($)
-              <input
-                type="number"
-                min={portfolio ? 1000 : 100}
-                max={principal / 100}
-                step={portfolio ? 1000 : 100}
-                value={amount}
-                onChange={(e) => setAmount(Number(e.target.value))}
-                required
-                disabled={!!plan?.locked}
-              />
-            </label>
+        {portfolio && (
+          <div
+            className="tranche-grid"
+            role="group"
+            aria-label="Portfolio position"
+          >
+            {(["senior", "mezzanine", "junior"] as const).map((t) => {
+              const info = trancheInfo[t];
+              const selectedRates =
+                structure?.allocations
+                  .filter((a) => a.tranche === t)
+                  .map((a) => a.rateBps) ?? [];
+              const quotes = activeBids.filter((b) => b.tranche === t);
+              return (
+                <button
+                  type="button"
+                  key={t}
+                  className="tranche-card"
+                  aria-pressed={tranche === t}
+                  disabled={locked}
+                  onClick={() => changeTranche(t)}
+                >
+                  <span className="tranche-name">
+                    {t.toUpperCase()}
+                    <RiskMeter level={info.risk} />
+                  </span>
+                  <span className="tranche-priority">{info.priority}</span>
+                  <span className="tranche-meta">{info.meta}</span>
+                  <span className="tranche-figures">
+                    <span>
+                      In current plan
+                      <b>
+                        {structure
+                          ? money(trancheTotal(structure, t))
+                          : "No plan yet"}
+                      </b>
+                    </span>
+                    <span>
+                      Selected yields <b>{rateRange(selectedRates)}</b>
+                    </span>
+                    <span>
+                      Quotes in book <b>{quotes.length}</b>
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
           </div>
-          <div className="form-row">
-            <label>
-              Required annual simple yield (%)
-              <input
-                type="number"
-                min={0}
-                max={50}
-                step="0.01"
-                value={yieldPct}
-                onChange={(e) => setYieldPct(Number(e.target.value))}
-                required
-                disabled={!!plan?.locked}
-              />
-            </label>
+        )}
+        <div className="bid-layout">
+          <form onSubmit={submit}>
+            <div className="form-row">
+              <label>
+                Investment amount (USD)
+                <input
+                  type="number"
+                  min={portfolio ? 1000 : 100}
+                  max={principal / 100}
+                  step={portfolio ? 1000 : 100}
+                  value={amount}
+                  onChange={(e) => setAmount(Number(e.target.value))}
+                  required
+                  disabled={locked}
+                />
+                <span className="field-hint">
+                  {portfolio ? "$1,000" : "$100"} increments
+                </span>
+              </label>
+              <label>
+                Required yield (% per year)
+                <input
+                  type="number"
+                  min={0}
+                  max={50}
+                  step="0.01"
+                  value={yieldPct}
+                  onChange={(e) => setYieldPct(Number(e.target.value))}
+                  required
+                  disabled={locked}
+                />
+                <span className="field-hint">Annual simple rate</span>
+              </label>
+            </div>
             <label>
               Bid expiration
               <input
@@ -183,45 +276,205 @@ export default function InvestmentPanel({
                 value={expiry}
                 onChange={(e) => setExpiry(e.target.value)}
                 required
-                disabled={!!plan?.locked}
+                disabled={locked}
               />
             </label>
-          </div>
-          <p className="small">
-            Maximum principal at risk:{" "}
-            <strong>{money(Math.round(Math.max(0, amount) * 100))}</strong>.
-            Actual awarded capital can be a partial fill. Returns are not
-            guaranteed.
-          </p>
-          {portfolio && (
-            <p className="small muted">
-              Senior requires 20% subordinated enhancement and at most 80%
-              advance. Mezzanine requires 10% junior + retained enhancement.
-              Originator retention absorbs losses before external junior.
+            {portfolio && (
+              <p className="small muted">
+                Senior requires 20% subordinated enhancement and at most 80%
+                advance. Mezzanine requires 10% junior + retained enhancement.
+              </p>
+            )}
+            {locked && (
+              <p className="callout small">
+                Accepted allocations are locked by a funding commitment. New
+                bids and withdrawals are disabled.
+              </p>
+            )}
+            <div className="form-actions">
+              <button
+                className="primary large"
+                disabled={busy || locked || current.role !== "investor"}
+              >
+                {busy ? "Submitting…" : "Submit Bid"}
+              </button>
+              {current.role !== "investor" && (
+                <button
+                  type="button"
+                  className="link-button"
+                  onClick={() => navigate("/signup")}
+                >
+                  Choose the investor role in Account
+                </button>
+              )}
+            </div>
+          </form>
+          <aside className="summary-card" aria-label="Bid summary">
+            <h4>Bid summary</h4>
+            <dl>
+              <div>
+                <dt>Position</dt>
+                <dd>{tranche === "whole" ? "Whole loan" : title(tranche)}</dd>
+              </div>
+              <div>
+                <dt>Amount</dt>
+                <dd>{money(Math.round(Math.max(0, amount) * 100))}</dd>
+              </div>
+              <div>
+                <dt>Required yield</dt>
+                <dd>{(yieldPct || 0).toFixed(2)}% / yr</dd>
+              </div>
+              <div>
+                <dt>Max principal at risk</dt>
+                <dd>{money(Math.round(Math.max(0, amount) * 100))}</dd>
+              </div>
+              <div>
+                <dt>Your bid here</dt>
+                <dd>
+                  {positionBid
+                    ? `${title(positionBid.status)} · ${money(positionBid.amount)}`
+                    : "None yet"}
+                </dd>
+              </div>
+            </dl>
+            <h4 style={{ marginTop: 16 }}>Funding & wallet</h4>
+            <dl>
+              <div>
+                <dt>Commitment mode</dt>
+                <dd>Simulated</dd>
+              </div>
+              <div>
+                <dt>XRPL EVM</dt>
+                <dd>
+                  {xrpl ? <StatusPill status={xrpl.status} /> : "Unknown"}
+                </dd>
+              </div>
+            </dl>
+            <p className="small muted" style={{ marginTop: 10 }}>
+              No wallet is needed to bid. No testnet facility is linked to this
+              opportunity, so commitments are simulated and create no blockchain
+              hash. Partial fills are possible.
             </p>
-          )}
-          <button
-            className="primary"
-            disabled={busy || !!plan?.locked || current.role !== "investor"}
-          >
-            Submit Bid
-          </button>
-          {current.role !== "investor" && (
-            <button
-              type="button"
-              className="link-button"
-              onClick={() => navigate("/signup")}
-            >
-              Choose the investor role in Account
-            </button>
-          )}
-        </form>
+          </aside>
+        </div>
       </div>
+
+      <div className="subsection">
+        <h3>
+          <span className="step-label">2</span>Commit funding
+        </h3>
+        <p className="small muted">
+          Commit once capital clearing selects your bid. Mode:{" "}
+          <strong>Simulated Commitment</strong> — debits your simulated balance;
+          no wallet transaction is sent.
+        </p>
+        {myBids.length === 0 ? (
+          <p className="empty">
+            Submit a bid to see it here. Bid submitted → selected by clearing →
+            committed → settled.
+          </p>
+        ) : (
+          <div className="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Your position</th>
+                  <th>Bid / selected</th>
+                  <th>Progress</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {myBids.map((b) => {
+                  const a = structure?.allocations.find(
+                    (a) => a.bidId === b.id,
+                  );
+                  const committed = Object.values(state.commitments).find(
+                    (c) => c.bidId === b.id,
+                  );
+                  return (
+                    <tr key={b.id}>
+                      <td>
+                        {title(b.tranche)}
+                        <small>{percent(b.rateBps)} / yr</small>
+                      </td>
+                      <td>
+                        {money(b.amount)} / {money(a?.amount ?? 0)}
+                        <small>{title(b.status)}</small>
+                      </td>
+                      <td>
+                        <ol className="lifecycle" aria-label="Bid progress">
+                          <li className="done">Bid submitted</li>
+                          <li className={a ? "done" : ""}>Selected</li>
+                          <li className={committed ? "done" : ""}>
+                            Committed · simulated
+                          </li>
+                          <li className={committed && settled ? "done" : ""}>
+                            Settled · simulated
+                          </li>
+                        </ol>
+                      </td>
+                      <td>
+                        {committed ? (
+                          <Badge tone="good">Committed (simulated)</Badge>
+                        ) : (
+                          <div className="button-row">
+                            <button
+                              className="primary small-button"
+                              disabled={
+                                busy || !a || !plan?.result.feasible || settled
+                              }
+                              onClick={() =>
+                                void action(
+                                  () =>
+                                    repository.transact((s) =>
+                                      commitSimulated(s, b.id),
+                                    ),
+                                  "Simulated commitment saved. No blockchain transaction was sent.",
+                                )
+                              }
+                            >
+                              Commit Funding · simulated
+                            </button>
+                            <button
+                              className="small-button"
+                              disabled={busy || b.status !== "active" || locked}
+                              onClick={() =>
+                                void action(
+                                  () =>
+                                    repository.transact((s) =>
+                                      withdrawBid(s, b.id),
+                                    ),
+                                  "Bid withdrawn and its unused balance released.",
+                                )
+                              }
+                            >
+                              Withdraw bid
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
       <div className="subsection">
         <div className="section-heading">
-          <h3>Capital clearing</h3>
+          <div>
+            <h3 style={{ margin: 0 }}>Capital clearing</h3>
+            <p className="small muted">
+              {portfolio
+                ? "Selects the lowest-cost feasible combination of submitted quotes."
+                : "Fills the loan from the lowest required yields first."}
+            </p>
+          </div>
           <button
-            disabled={busy || !!plan?.locked}
+            disabled={busy || locked}
             onClick={() =>
               void action(
                 () => repository.transact((s) => reclear(s, id)),
@@ -237,7 +490,7 @@ export default function InvestmentPanel({
             ? "Feasible funding plan"
             : "Not yet financeable"}
         </Badge>
-        <p className="small">
+        <p className="small" style={{ marginTop: 8 }}>
           {plan?.result.reason ??
             "Submit bids or run clearing to evaluate the market."}
         </p>
@@ -246,12 +499,6 @@ export default function InvestmentPanel({
             Eligible capital gap:{" "}
             <strong>{money(plan.result.fundingGap)}</strong>. A zero gap still
             requires pricing and risk constraints to be satisfied.
-          </p>
-        )}
-        {plan?.locked && (
-          <p className="callout small">
-            The accepted allocations are locked by a funding commitment. New
-            bids and withdrawals are disabled.
           </p>
         )}
         {structure && <StructureTable structure={structure} />}
@@ -297,101 +544,6 @@ export default function InvestmentPanel({
           </div>
         </details>
       </div>
-      <div className="subsection">
-        <h3>2. Commit funding</h3>
-        <p className="small muted">
-          Mode: <strong>Simulated Commitment</strong>. No matching deployed
-          testnet facility is linked to these opportunities. No wallet
-          transaction or real hash will be created.
-        </p>
-        {myBids.length === 0 ? (
-          <p className="small muted">
-            Submit a bid to receive a selected allocation.
-          </p>
-        ) : (
-          <div className="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>Your position</th>
-                  <th>Bid / selected</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {myBids.map((b) => {
-                  const a = structure?.allocations.find(
-                    (a) => a.bidId === b.id,
-                  );
-                  const committed = Object.values(state.commitments).find(
-                    (c) => c.bidId === b.id,
-                  );
-                  return (
-                    <tr key={b.id}>
-                      <td>
-                        {title(b.tranche)}
-                        <small>{percent(b.rateBps)}</small>
-                      </td>
-                      <td>
-                        {money(b.amount)} / {money(a?.amount ?? 0)}
-                      </td>
-                      <td>
-                        {committed ? "Simulated commitment" : title(b.status)}
-                      </td>
-                      <td>
-                        {committed ? (
-                          <Badge tone="good">Committed</Badge>
-                        ) : (
-                          <div className="button-row">
-                            <button
-                              className="primary small-button"
-                              disabled={
-                                busy ||
-                                !a ||
-                                !plan?.result.feasible ||
-                                !!state.settlements[id]
-                              }
-                              onClick={() =>
-                                void action(
-                                  () =>
-                                    repository.transact((s) =>
-                                      commitSimulated(s, b.id),
-                                    ),
-                                  "Simulated commitment saved. No blockchain transaction was sent.",
-                                )
-                              }
-                            >
-                              Commit Funding · simulated
-                            </button>
-                            <button
-                              className="small-button"
-                              disabled={
-                                busy || b.status !== "active" || !!plan?.locked
-                              }
-                              onClick={() =>
-                                void action(
-                                  () =>
-                                    repository.transact((s) =>
-                                      withdrawBid(s, b.id),
-                                    ),
-                                  "Bid withdrawn and its unused balance released.",
-                                )
-                              }
-                            >
-                              Withdraw bid
-                            </button>
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
       {structure && (
         <div className="subsection">
           <h3>Recovery stress</h3>
@@ -409,10 +561,9 @@ export default function InvestmentPanel({
           </label>
           <StressTable structure={structure} recoveryBps={recovery * 100} />
           <p className="small muted">
-            Principal-only stress is separate from the full settlement
-            waterfall, which also pays collection fees and coupons. Junior is
-            paid after senior and mezzanine; retained originator capital is the
-            first loss layer.
+            Principal-only stress, separate from the full settlement waterfall
+            (which also pays fees and coupons). Retained originator capital is
+            the first loss layer, then junior, then mezzanine, then senior.
           </p>
         </div>
       )}

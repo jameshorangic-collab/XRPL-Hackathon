@@ -75,6 +75,9 @@ function Application() {
             navigate(user ? "/dashboard" : "/signup");
           }}
         >
+          <span className="brand-mark" aria-hidden="true">
+            <span />
+          </span>
           BACKSTOP
         </a>
         {user && (
@@ -94,15 +97,20 @@ function Application() {
             ))}
           </nav>
         )}
-        <span className="demo-label">Synthetic demo</span>
+        <div className="header-end">
+          <span className="demo-label">Synthetic demo</span>
+        </div>
       </header>
       {user && (
         <div className="profile-bar">
           <span>
-            Demo profile: <strong>{user.name}</strong>
+            <span className="avatar" aria-hidden="true">
+              {user.name.trim().charAt(0).toUpperCase() || "?"}
+            </span>
+            Signed in as <strong>{user.name}</strong>
           </span>
           <label>
-            Role
+            Viewing as
             <select
               aria-label="Demo profile role"
               value={user.role}
@@ -121,10 +129,12 @@ function Application() {
           </label>
         </div>
       )}
-      <p className="demo-banner">
-        Synthetic applications and assessments. Marketplace funding is
-        simulated. Demo profiles are not secure authentication.
-      </p>
+      {user && (
+        <p className="demo-banner">
+          Hackathon demo · synthetic applications and assessments · marketplace
+          funding is simulated · demo profiles are not secure authentication.
+        </p>
+      )}
       {!user || route === "/signup" ? (
         <SignupPage />
       ) : route === "/borrow" ? (

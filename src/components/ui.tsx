@@ -33,6 +33,20 @@ export function Badge({
 }) {
   return <span className={`badge ${tone}`}>{children}</span>;
 }
+/** Integration status with a colored dot. Only "Connected" renders green. */
+export function StatusPill({ status }: { status: string }) {
+  const cls =
+    status === "Connected"
+      ? "connected"
+      : status === "Error"
+        ? "error"
+        : status === "Demo mode"
+          ? "demo"
+          : status === "Pending"
+            ? "pending"
+            : "";
+  return <span className={`status-pill ${cls}`}>{status}</span>;
+}
 export function PageTitle({
   title: heading,
   description,
@@ -67,7 +81,10 @@ export function FundingProgress({
   return (
     <div className="funding">
       <div>
-        <span>Simulated funding</span>
+        <span>
+          {total ? Math.floor((committed * 100) / total) : 0}% committed ·
+          simulated
+        </span>
         <strong>
           {money(committed)} / {money(total)}
         </strong>

@@ -38,10 +38,11 @@ export default function DashboardPage() {
         title="Dashboard"
         description={`Your ${user.role} activity. All application and investment records are demo data.`}
       >
-        <Badge>
+        <Badge tone="info">
           {user.role === "borrower" ? "Borrower view" : "Investor view"}
         </Badge>
       </PageTitle>
+      <IntegrationPanel />
       {user.role === "borrower" ? (
         <>
           <div className="stats three">
@@ -171,7 +172,8 @@ export default function DashboardPage() {
         </>
       ) : (
         <>
-          <div className="stats three">
+          <div className="stats four">
+            <Stat label="Bids submitted" value={bids.length} />
             <Stat
               label="Simulated cash balance"
               value={money(user.cashBalance)}
@@ -224,8 +226,28 @@ export default function DashboardPage() {
                         </td>
                         <td>{title(b.tranche)}</td>
                         <td>{money(b.amount)}</td>
-                        <td>{percent(b.rateBps)}</td>
-                        <td>{title(b.status)}</td>
+                        <td>{percent(b.rateBps)} / yr</td>
+                        <td>
+                          <Badge
+                            tone={
+                              Object.values(state.commitments).some(
+                                (c) => c.bidId === b.id,
+                              )
+                                ? "good"
+                                : b.status === "awarded"
+                                  ? "info"
+                                  : b.status === "active"
+                                    ? "neutral"
+                                    : "warning"
+                            }
+                          >
+                            {Object.values(state.commitments).some(
+                              (c) => c.bidId === b.id,
+                            )
+                              ? "Committed · simulated"
+                              : title(b.status)}
+                          </Badge>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -328,7 +350,9 @@ export default function DashboardPage() {
                     <td>{dateTime(t.createdAt)}</td>
                     <td>{t.label}</td>
                     <td>
-                      <Badge>{t.mode}</Badge>
+                      <Badge tone={t.mode === "simulated" ? "warning" : "good"}>
+                        {title(t.mode)}
+                      </Badge>
                     </td>
                     <td>{money(t.amount, true)}</td>
                     <td>
@@ -350,9 +374,9 @@ export default function DashboardPage() {
           </Empty>
         )}
       </section>
+      <h2 className="tools-heading">Developer & demo tools</h2>
       <DemoControls />
       <WalletPanel />
-      <IntegrationPanel />
       <LegacyChainPanel />
     </main>
   );
