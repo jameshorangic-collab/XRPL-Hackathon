@@ -13,6 +13,9 @@ import {
   expectedCreditLoss,
   maxSectorConcentrationBps,
 } from "../domain/finance";
+import { availableToBid } from "../domain/marketplace";
+const statusLabel = (status: string) =>
+  status === "open" ? "Open" : `Simulated · ${status}`;
 export default function InvestPage() {
   const { state } = useApp();
   const [tab, setTab] = useState<"loans" | "portfolios">("loans");
@@ -21,12 +24,31 @@ export default function InvestPage() {
     .filter((l) => !l.portfolioId)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   const portfolios = Object.values(state.portfolios);
+  const user = state.users[state.currentUserId!];
+  const open = (id: string) => {
+    setSelected(id);
+    requestAnimationFrame(() =>
+      document
+        .querySelector(".investment-panel")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+    );
+  };
   return (
     <main>
       <PageTitle
         title="Invest"
-        description="Browse synthetic loans and portfolios. Submit bids, then commit simulated capital."
-      />
+        description="Fund individual small-business loans or diversified portfolios. Submit a bid, then commit capital once clearing selects it."
+      >
+        {user.role === "investor" && (
+          <div className="stat" style={{ padding: "12px 16px" }}>
+            <span>Available to bid</span>
+            <strong style={{ fontSize: 20 }}>
+              {money(availableToBid(state, user.id))}
+            </strong>
+            <small>Simulated balance</small>
+          </div>
+        )}
+      </PageTitle>
       <div
         className="tabs"
         role="tablist"
@@ -53,116 +75,161 @@ export default function InvestPage() {
           Loan Portfolios <span>{portfolios.length}</span>
         </button>
       </div>
-      <section
-        aria-label={
-          tab === "loans"
-            ? "Individual loan marketplace"
-            : "Portfolio marketplace"
-        }
-        className="opportunity-grid tab-enter"
-        key={tab}
-      >
-        {tab === "loans" ? (
-          loans.length ? (
-            loans.map((l) => (
-              <article
-                className={`panel opportunity ${selected === l.id ? "selected" : ""}`}
-                key={l.id}
-              >
-                <div className="section-heading">
-                  <h2>{l.loan.business}</h2>
-                  <Badge tone={l.status === "open" ? "neutral" : "good"}>
-                    {l.status === "open" ? "Open" : `Simulated ${l.status}`}
-                  </Badge>
-                </div>
-                <p className="card-meta">
-                  {l.loan.sector}
-                  <span className="grade">Grade {l.loan.grade}</span>
-                </p>
-                <div className="detail-grid">
-                  <p>
-                    <span>Loan amount</span>
-                    <strong>{money(l.loan.principal)}</strong>
+      {tab === "loans" ? (
+        loans.length ? (
+          <section
+            className="panel market-panel"
+            aria-label="Individual loan marketplace"
+          >
+            <div className="table-scroll">
+              <table className="market-table">
+                <thead>
+                  <tr>
+                    <th>Business</th>
+                    <th>Industry</th>
+                    <th>Requested capital</th>
+                    <th>Indicative yield</th>
+                    <th>Term</th>
+                    <th>Risk summary</th>
+                    <th>Committed · simulated</th>
+                    <th />
+                  </tr>
+                </thead>
+                <tbody>
+                  {loans.map((l) => (
+                    <tr
+                      key={l.id}
+                      className={selected === l.id ? "selected" : ""}
+                      onClick={() => open(l.id)}
+                    >
+                      <td className="first">
+                        <span className="business">{l.loan.business}</span>
+                        <small>
+                          {statusLabel(l.status)}
+                          {l.applicationId ? "" : " · synthetic listing"}
+                        </small>
+                      </td>
+                      <td data-label="Industry">{l.loan.sector}</td>
+                      <td data-label="Requested capital" className="num">
+                        {money(l.loan.principal)}
+                      </td>
+                      <td data-label="Indicative yield" className="num">
+                        up to {percent(l.loan.couponBps)} / yr
+                      </td>
+                      <td data-label="Term" className="num">
+                        {l.loan.months} mo
+                      </td>
+                      <td data-label="Risk summary">
+                        <div className="cell-stack">
+                          <Badge
+                            tone={
+                              l.loan.grade.includes("lower")
+                                ? "good"
+                                : l.loan.grade.includes("higher")
+                                  ? "warning"
+                                  : "neutral"
+                            }
+                          >
+                            {l.loan.grade}
+                          </Badge>
+                          <small>
+                            {percent(l.loan.pdBps)} assumed chance of default
+                          </small>
+                        </div>
+                      </td>
+                      <td data-label="Funding">
+                        <FundingProgress state={state} id={l.id} />
+                      </td>
+                      <td className="action">
+                        <button
+                          className={selected === l.id ? "" : "primary"}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            open(l.id);
+                          }}
+                        >
+                          {l.status === "open" ? "Invest / Bid" : "View"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ) : (
+          <Empty>
+            No eligible loans yet. Submit a borrower application, or add a
+            synthetic loan from the Dashboard demo controls.
+          </Empty>
+        )
+      ) : (
+        <section
+          aria-label="Portfolio marketplace"
+          className="opportunity-grid"
+        >
+          {portfolios.length ? (
+            portfolios.map((p) => {
+              const industries = new Set(p.terms.loans.map((l) => l.sector))
+                .size;
+              return (
+                <article
+                  key={p.id}
+                  className={`panel opportunity ${selected === p.id ? "selected" : ""}`}
+                >
+                  <div className="section-heading">
+                    <div>
+                      <span className="eyebrow">Portfolio</span>
+                      <h2>{p.name}</h2>
+                    </div>
+                    <Badge tone={p.status === "open" ? "info" : "good"}>
+                      {statusLabel(p.status)}
+                    </Badge>
+                  </div>
+                  <div className="detail-grid">
+                    <p>
+                      <span>Total principal</span>
+                      <strong>{money(p.terms.target)}</strong>
+                    </p>
+                    <p>
+                      <span>Businesses</span>
+                      <strong>{p.terms.loans.length}</strong>
+                    </p>
+                    <p>
+                      <span>Industries</span>
+                      <strong>
+                        {industries} · largest{" "}
+                        {percent(maxSectorConcentrationBps(p.terms.loans))}
+                      </strong>
+                    </p>
+                    <p>
+                      <span>Assumed expected loss</span>
+                      <strong>
+                        {money(expectedCreditLoss(p.terms.loans))}
+                      </strong>
+                    </p>
+                  </div>
+                  <p className="small muted">
+                    Repaid in a single payment after {p.terms.termMonths}{" "}
+                    months. Investors choose a senior, mezzanine, or junior
+                    position, and the originator keeps a first-loss stake that
+                    absorbs losses before any investor.
                   </p>
-                  <p>
-                    <span>Term</span>
-                    <strong>{l.loan.months} months</strong>
-                  </p>
-                  <p>
-                    <span>Indicative coupon cap</span>
-                    <strong>{percent(l.loan.couponBps)} / yr</strong>
-                  </p>
-                  <p>
-                    <span>Position</span>
-                    <strong>Whole loan</strong>
-                  </p>
-                </div>
-                <p className="risk-summary">
-                  <span>Risk summary</span>
-                  {l.recommendation} Assumed default probability{" "}
-                  {percent(l.loan.pdBps)} / yr (synthetic).
-                </p>
-                <FundingProgress state={state} id={l.id} />
-                <button className="primary" onClick={() => setSelected(l.id)}>
-                  {l.status === "open" ? "View & bid" : "View funding details"}
-                </button>
-              </article>
-            ))
+                  <FundingProgress state={state} id={p.id} />
+                  <button className="primary" onClick={() => open(p.id)}>
+                    Choose a position
+                  </button>
+                </article>
+              );
+            })
           ) : (
             <Empty>
-              No eligible loans yet. Submit a borrower application or add a
-              synthetic loan in Dashboard demo controls.
+              No portfolios yet. Load the diversified portfolio from the
+              Dashboard demo controls.
             </Empty>
-          )
-        ) : (
-          portfolios.map((p) => (
-            <article
-              key={p.id}
-              className={`panel opportunity ${selected === p.id ? "selected" : ""}`}
-            >
-              <div className="section-heading">
-                <h2>{p.name}</h2>
-                <Badge>
-                  {p.status === "open" ? "Open" : `Simulated ${p.status}`}
-                </Badge>
-              </div>
-              <div className="detail-grid">
-                <p>
-                  <span>Total principal</span>
-                  <strong>{money(p.terms.target)}</strong>
-                </p>
-                <p>
-                  <span>Underlying loans</span>
-                  <strong>{p.terms.loans.length}</strong>
-                </p>
-                <p>
-                  <span>Assumed expected loss</span>
-                  <strong>{money(expectedCreditLoss(p.terms.loans))}</strong>
-                </p>
-                <p>
-                  <span>Largest industry</span>
-                  <strong>
-                    {percent(maxSectorConcentrationBps(p.terms.loans))}
-                  </strong>
-                </p>
-              </div>
-              <p className="small muted">
-                {new Set(p.terms.loans.map((l) => l.sector)).size} industries ·{" "}
-                {p.terms.termMonths}-month bullet model
-              </p>
-              <div className="tranche-chips" aria-label="Available positions">
-                <span className="senior">Senior</span>
-                <span className="mezzanine">Mezzanine</span>
-                <span className="junior">Junior</span>
-              </div>
-              <FundingProgress state={state} id={p.id} />
-              <button className="primary" onClick={() => setSelected(p.id)}>
-                Choose tranche & bid
-              </button>
-            </article>
-          ))
-        )}
-      </section>
+          )}
+        </section>
+      )}
       {selected && (
         <InvestmentPanel
           key={selected}
@@ -171,9 +238,10 @@ export default function InvestPage() {
         />
       )}
       <p className="footnote">
-        All loan records, risk assumptions, quotes, and projected returns are
-        synthetic. A bid is not funding, and a simulated commitment is not a
-        blockchain transfer.
+        All loans, risk assumptions, quotes, and projected returns are
+        synthetic. Returns are not guaranteed. A submitted bid is not committed
+        capital, and a simulated commitment is not a settled blockchain
+        transaction.
       </p>
     </main>
   );

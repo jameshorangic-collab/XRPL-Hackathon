@@ -1,28 +1,31 @@
 import { useState, type FormEvent } from "react";
-import { Building2, TrendingUp, ArrowRight } from "lucide-react";
 import { useApp } from "../components/AppContext";
 import { registerProfile } from "../domain/marketplace";
 import type { Role } from "../domain/marketTypes";
 import { navigate } from "../router";
-const roleCards: {
-  role: Role;
-  title: string;
-  text: string;
-  Icon: typeof Building2;
-}[] = [
+const roles: { value: Role; title: string; detail: string; icon: string }[] = [
   {
-    role: "borrower",
+    value: "borrower",
     title: "Borrower",
-    text: "Request financing for your business and get an underwriting assessment.",
-    Icon: Building2,
+    detail: "Request financing for your business",
+    icon: "↗",
   },
   {
-    role: "investor",
+    value: "investor",
     title: "Investor",
-    text: "Explore loans and portfolios. Choose senior, mezzanine, or junior exposure.",
-    Icon: TrendingUp,
+    detail: "Explore loans and portfolios",
+    icon: "◫",
   },
 ];
+// Mirrors registerProfile's rules so mistakes show inline before the domain check.
+function validate(name: string, email: string) {
+  const errors: { name?: string; email?: string } = {};
+  if (name.trim().length < 2 || name.trim().length > 100)
+    errors.name = "Enter your full name (2–100 characters).";
+  if (!/^\S+@\S+\.\S+$/.test(email.trim()) || email.trim().length > 200)
+    errors.email = "Enter a valid email address, like name@example.test.";
+  return errors;
+}
 export default function SignupPage() {
   const { state, repository, action, busy } = useApp();
   const current = state.currentUserId ? state.users[state.currentUserId] : null;
@@ -31,24 +34,13 @@ export default function SignupPage() {
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
-    const name = String(f.get("name")).trim();
-    const email = String(f.get("email")).trim();
-    const next = {
-      name: name.length < 2 ? "Enter at least 2 characters." : undefined,
-      email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-        ? undefined
-        : "Enter a valid email address.",
-    };
-    setErrors(next);
-    if (next.name || next.email) return;
+    const name = String(f.get("name"));
+    const email = String(f.get("email"));
+    const found = validate(name, email);
+    setErrors(found);
+    if (found.name || found.email) return;
     const result = await action(() =>
-      repository.transact((s) =>
-        registerProfile(s, {
-          name: String(f.get("name")),
-          email: String(f.get("email")),
-          role,
-        }),
-      ),
+      repository.transact((s) => registerProfile(s, { name, email, role })),
     );
     if (result) navigate(role === "borrower" ? "/borrow" : "/invest");
   }
@@ -56,78 +48,88 @@ export default function SignupPage() {
     <main className="signup">
       <div className="signup-card">
         <span className="eyebrow">
-          {current ? "YOUR DEMO PROFILE" : "GET STARTED"}
+          {current ? "Account" : "Small-business credit marketplace"}
         </span>
-        <h1>Finance businesses. Invest with choice.</h1>
+        <h1>
+          {current
+            ? "Your demo profile"
+            : "Finance businesses. Invest with choice."}
+        </h1>
         <p>
-          Small businesses request loans. Investors fund them, one loan at a
-          time or through tranched portfolios.
+          {current
+            ? "Update your details or switch between borrowing and investing."
+            : "Small businesses request loans. Investors fund them directly or through senior, mezzanine, and junior portfolio positions."}
         </p>
         <form onSubmit={submit} noValidate>
+          <label>
+            Full name
+            <input
+              name="name"
+              autoComplete="name"
+              maxLength={100}
+              defaultValue={current?.name ?? ""}
+              placeholder="Jordan Lee"
+              aria-invalid={!!errors.name}
+              aria-describedby={errors.name ? "name-error" : undefined}
+              required
+            />
+            {errors.name && (
+              <span id="name-error" className="field-error">
+                {errors.name}
+              </span>
+            )}
+          </label>
+          <label>
+            Email
+            <input
+              name="email"
+              type="email"
+              autoComplete="email"
+              maxLength={200}
+              defaultValue={current?.email ?? ""}
+              placeholder="name@example.test"
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? "email-error" : undefined}
+              required
+            />
+            {errors.email && (
+              <span id="email-error" className="field-error">
+                {errors.email}
+              </span>
+            )}
+          </label>
           <fieldset>
             <legend>I want to</legend>
             <div className="role-options">
-              {roleCards.map(({ role: r, title, text, Icon }) => (
-                <label key={r} className={role === r ? "selected" : ""}>
+              {roles.map((r) => (
+                <label className="role-card" key={r.value}>
                   <input
                     type="radio"
                     name="role"
-                    value={r}
-                    checked={role === r}
-                    onChange={() => setRole(r)}
+                    value={r.value}
+                    checked={role === r.value}
+                    onChange={() => setRole(r.value)}
                   />
-                  <span className="role-icon">
-                    <Icon size={20} />
+                  <span className="role-check" aria-hidden="true">
+                    ✓
                   </span>
-                  <strong>{title}</strong>
-                  <span className="role-text">{text}</span>
+                  <span className="role-icon" aria-hidden="true">
+                    {r.icon}
+                  </span>
+                  {r.title}
+                  <small>{r.detail}</small>
                 </label>
               ))}
             </div>
           </fieldset>
-          <div className="form-row">
-            <label>
-              Full name
-              <input
-                name="name"
-                autoComplete="name"
-                minLength={2}
-                maxLength={100}
-                defaultValue={current?.name ?? ""}
-                placeholder="Jordan Lee"
-                aria-invalid={!!errors.name}
-                required
-              />
-              {errors.name && (
-                <span className="field-error">{errors.name}</span>
-              )}
-            </label>
-            <label>
-              Email
-              <input
-                name="email"
-                type="email"
-                autoComplete="email"
-                maxLength={200}
-                defaultValue={current?.email ?? ""}
-                placeholder="name@example.test"
-                aria-invalid={!!errors.email}
-                required
-              />
-              {errors.email && (
-                <span className="field-error">{errors.email}</span>
-              )}
-            </label>
-          </div>
           <button className="primary large" disabled={busy}>
             {busy ? "Saving…" : "Continue"}
-            {!busy && <ArrowRight size={16} />}
           </button>
         </form>
         <p className="small muted">
-          Demo profile saved in this browser, not secure authentication. Use
-          synthetic details. No password or wallet required. You can switch
-          roles at any time.
+          Demo account — not secure authentication. Your profile is saved in
+          this browser. Use synthetic details; no password or wallet is
+          required.
         </p>
       </div>
     </main>

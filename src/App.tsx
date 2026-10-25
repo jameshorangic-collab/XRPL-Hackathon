@@ -1,5 +1,6 @@
-import { Component, useEffect, type ReactNode } from "react";
+import { Component, useEffect, useRef, type ReactNode } from "react";
 import { AppProvider, useApp } from "./components/AppContext";
+import IntegrationWalletBridge from "./components/IntegrationWalletBridge";
 import SignupPage from "./pages/SignupPage";
 import BorrowPage from "./pages/BorrowPage";
 import InvestPage from "./pages/InvestPage";
@@ -8,9 +9,6 @@ import { navigate, useRoute, type Route } from "./router";
 import { switchProfileRole } from "./domain/marketplace";
 import { storageKey } from "./data/repository";
 import { createSeedState } from "./data/marketSeed";
-import IntegrationWalletBridge from "./components/IntegrationWalletBridge";
-import LiquidBackground from "./components/LiquidBackground";
-import Logo from "./components/Logo";
 class StartupBoundary extends Component<
   { children: ReactNode },
   { error: string }
@@ -61,21 +59,52 @@ function Application() {
     else if (user && (route === "/" || route === null))
       navigate("/dashboard", true);
   }, [user, route]);
+  // Expose the sticky header's height so pinned page tabs sit just below it.
+  const header = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = header.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const sync = () =>
+      document.documentElement.style.setProperty(
+        "--header-h",
+        `${el.offsetHeight}px`,
+      );
+    const observer = new ResizeObserver(sync);
+    observer.observe(el);
+    sync();
+    return () => observer.disconnect();
+  }, []);
+  // Hide the banner while scrolling down; bring it back on any scroll up.
+  useEffect(() => {
+    const root = document.documentElement;
+    let last = window.scrollY;
+    let frame = 0;
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        const y = window.scrollY;
+        if (y < 80) root.dataset.header = "shown";
+        else if (Math.abs(y - last) > 6)
+          root.dataset.header = y > last ? "hidden" : "shown";
+        last = y;
+        frame = 0;
+      });
+    };
+    root.dataset.header = "shown";
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(frame);
+    };
+  }, []);
   const links: [Route, string][] = [
     ["/borrow", "Request Loan"],
     ["/invest", "Invest"],
     ["/dashboard", "Dashboard"],
-    ["/signup", "Account"],
   ];
-  const switchRole = (role: "borrower" | "investor") =>
-    void action(async () => {
-      await repository.transact((s) => switchProfileRole(s, role));
-      navigate(role === "borrower" ? "/borrow" : "/invest");
-    });
   return (
     <>
-      <LiquidBackground />
-      <header className="app-header">
+      <header className="app-header" ref={header}>
         <a
           className="brand"
           href={user ? "/dashboard" : "/signup"}
@@ -84,8 +113,10 @@ function Application() {
             navigate(user ? "/dashboard" : "/signup");
           }}
         >
-          <Logo />
-          Backstop
+          <span className="brand-mark" aria-hidden="true">
+            <span />
+          </span>
+          BACKSTOP
         </a>
         {user && (
           <nav aria-label="Main navigation">
@@ -104,57 +135,73 @@ function Application() {
             ))}
           </nav>
         )}
-        <div className="header-right">
+        <div className="header-end">
+          <span className="demo-label">Synthetic demo</span>
           {user && (
-            <div
-              className="role-switch"
-              role="group"
-              aria-label="Demo profile role"
+            <a
+              className="account-link"
+              href="/signup"
+              aria-current={route === "/signup" ? "page" : undefined}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/signup");
+              }}
             >
-              {(["borrower", "investor"] as const).map((r) => (
-                <button
-                  key={r}
-                  type="button"
-                  aria-pressed={user.role === r}
-                  disabled={busy || user.role === r}
-                  onClick={() => switchRole(r)}
-                >
-                  {r === "borrower" ? "Borrower" : "Investor"}
-                </button>
-              ))}
-            </div>
-          )}
-          {user && (
-            <span className="user-chip" title={user.email}>
-              {user.name
-                .split(/\s+/)
-                .map((w) => w[0])
-                .join("")
-                .slice(0, 2)
-                .toUpperCase()}
-            </span>
+              <span className="avatar" aria-hidden="true">
+                {user.name.trim().charAt(0).toUpperCase() || "?"}
+              </span>
+              <span className="account-text">
+                <span className="account-name">{user.name}</span>
+                <span className="account-role">
+                  Account · {user.role === "borrower" ? "Borrower" : "Investor"}
+                </span>
+              </span>
+            </a>
           )}
         </div>
       </header>
-      <p className="demo-banner">
-        <span className="demo-label">Synthetic demo</span>
-        Applications and assessments are synthetic. Marketplace funding is
-        simulated. Demo profiles are not secure authentication.
-      </p>
+      {user && (
+        <div className="profile-bar">
+          <label>
+            Viewing as
+            <select
+              aria-label="Demo profile role"
+              value={user.role}
+              disabled={busy}
+              onChange={(e) => {
+                const role = e.target.value as "borrower" | "investor";
+                void action(async () => {
+                  await repository.transact((s) => switchProfileRole(s, role));
+                  navigate(role === "borrower" ? "/borrow" : "/invest");
+                });
+              }}
+            >
+              <option value="borrower">Borrower</option>
+              <option value="investor">Investor</option>
+            </select>
+          </label>
+        </div>
+      )}
+      {user && (
+        <p className="demo-banner">
+          This is a hackathon demo. Every business, assessment, and balance is
+          synthetic, investments are simulated rather than sent on-chain, and
+          demo profiles are not secure accounts.
+        </p>
+      )}
       <IntegrationWalletBridge />
-      <div className="page-transition" key={user ? route : "/signup"}>
-        {!user || route === "/signup" ? (
-          <SignupPage />
-        ) : route === "/borrow" ? (
-          <BorrowPage />
-        ) : route === "/invest" ? (
-          <InvestPage />
-        ) : (
-          <DashboardPage />
-        )}
-      </div>
+      {!user || route === "/signup" ? (
+        <SignupPage />
+      ) : route === "/borrow" ? (
+        <BorrowPage />
+      ) : route === "/invest" ? (
+        <InvestPage />
+      ) : (
+        <DashboardPage />
+      )}
       <footer>
-        BACKSTOP · Hackathon prototype · Browser data persists on this device
+        BACKSTOP is a hackathon prototype. Your demo data is saved only in this
+        browser.
       </footer>
     </>
   );

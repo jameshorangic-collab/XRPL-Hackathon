@@ -2,8 +2,8 @@ import { useState, type FormEvent } from "react";
 import { useApp } from "../components/AppContext";
 import { PageTitle, Badge, money } from "../components/ui";
 import UnderwritingPanel from "../components/UnderwritingPanel";
-import { exampleApplication } from "../data/marketSeed";
 import { bakeryApplication } from "../data/bakeryDemo";
+import { exampleApplication } from "../data/marketSeed";
 import type { ApplicationInput } from "../domain/marketTypes";
 import { navigate } from "../router";
 const blank: ApplicationInput = {
@@ -19,6 +19,17 @@ const blank: ApplicationInput = {
   yearsOperating: 0,
   notes: "",
 };
+// Synthetic walkthrough example (same shape and units as exampleApplication: cents).
+const bakeryExample: ApplicationInput = bakeryApplication;
+const categories = [
+  "Services",
+  "Healthcare",
+  "Manufacturing",
+  "Logistics",
+  "Retail",
+  "Wholesale",
+  "Food & beverage",
+];
 export default function BorrowPage() {
   const { state, service, action, busy } = useApp();
   const [form, setForm] = useState<ApplicationInput>(blank);
@@ -27,6 +38,7 @@ export default function BorrowPage() {
     .filter((a) => a.userId === state.currentUserId)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   const id = selected || applications[0]?.id;
+  const isBorrower = state.users[state.currentUserId!].role === "borrower";
   const field = (k: keyof ApplicationInput, value: string) =>
     setForm((s) => ({
       ...s,
@@ -49,197 +61,223 @@ export default function BorrowPage() {
     );
     if (result) setSelected(result);
   }
+  const cashAfterCosts =
+    form.monthlyRevenue - form.monthlyExpenses - form.monthlyDebt;
   return (
     <main>
       <PageTitle
         title="Request a loan"
-        description="Submit a synthetic business application for a preliminary demo assessment."
+        description="Tell us about your business and the financing you need. You'll receive a preliminary underwriting assessment in seconds."
       >
-        <Badge>Demo underwriting</Badge>
+        <Badge tone="info">Demo underwriting · synthetic data</Badge>
       </PageTitle>
+      {!isBorrower && (
+        <p className="callout warning">
+          You are viewing as an investor. Switch to the borrower role in the bar
+          above to submit an application.
+        </p>
+      )}
       <div className="two-column">
-        <section className="panel">
+        <section className="panel" aria-labelledby="application-title">
           <div className="section-heading">
-            <h2>Loan application</h2>
-            <button type="button" onClick={() => setForm(bakeryApplication)}>
-              Load Demo Bakery
-            </button>
-            <button
-              className="link-button"
-              type="button"
-              onClick={() => setForm({ ...exampleApplication })}
-            >
-              Fill synthetic example
-            </button>
+            <div>
+              <h2 id="application-title">Loan application</h2>
+            </div>
+            <div className="button-row" style={{ margin: 0 }}>
+              <button
+                className="small-button"
+                type="button"
+                onClick={() => setForm({ ...bakeryExample })}
+              >
+                Load Demo Bakery
+              </button>
+              <button
+                className="link-button"
+                type="button"
+                onClick={() => setForm({ ...exampleApplication })}
+              >
+                Design studio example
+              </button>
+            </div>
           </div>
           <form onSubmit={submit}>
-            <h3 className="form-section">Business details</h3>
-            <div className="form-row">
+            <div className="form-section">
+              <h3>Business details</h3>
+              <p className="section-note">
+                Who the business is and how long it has operated. Operating
+                history affects eligibility.
+              </p>
+              <div className="form-row">
+                <label>
+                  Business name
+                  <input
+                    value={form.businessName}
+                    onChange={(e) => field("businessName", e.target.value)}
+                    maxLength={100}
+                    placeholder="Maple Street Bakery"
+                    required
+                  />
+                </label>
+                <label>
+                  Industry
+                  <select
+                    value={form.category}
+                    onChange={(e) => field("category", e.target.value)}
+                  >
+                    {categories.map((s) => (
+                      <option key={s}>{s}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
               <label>
-                Business name
-                <input
-                  value={form.businessName}
-                  onChange={(e) => field("businessName", e.target.value)}
-                  maxLength={100}
+                Business description
+                <textarea
+                  value={form.description}
+                  onChange={(e) => field("description", e.target.value)}
+                  minLength={20}
+                  maxLength={2000}
                   required
+                  rows={3}
+                  placeholder="What the business does and who it serves."
                 />
+                <span className="field-hint">At least 20 characters.</span>
               </label>
-              <label>
-                Industry
-                <select
-                  value={form.category}
-                  onChange={(e) => field("category", e.target.value)}
-                >
-                  {[
-                    "Services",
-                    "Healthcare",
-                    "Manufacturing",
-                    "Logistics",
-                    "Retail",
-                    "Wholesale",
-                    "Food & beverage",
-                  ].map((s) => (
-                    <option key={s}>{s}</option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            <label>
-              Business description
-              <textarea
-                value={form.description}
-                onChange={(e) => field("description", e.target.value)}
-                minLength={20}
-                maxLength={2000}
-                required
-                rows={3}
-              />
-            </label>
-            <div className="form-row">
-              <label>
-                Years in operation
-                <input
-                  type="number"
-                  min={0}
-                  max={100}
-                  step="0.1"
-                  value={form.yearsOperating}
-                  onChange={(e) => field("yearsOperating", e.target.value)}
-                  required
-                />
-              </label>
-            </div>
-            <h3 className="form-section">Loan details</h3>
-            <div className="form-row">
-              <label>
-                Requested loan amount ($)
-                <input
-                  type="number"
-                  min={1000}
-                  max={100000}
-                  step={100}
-                  value={form.amount / 100}
-                  onChange={(e) => field("amount", e.target.value)}
-                  required
-                />
-              </label>
-              <label>
-                Desired term
-                <select
-                  value={form.termMonths}
-                  onChange={(e) => field("termMonths", e.target.value)}
-                >
-                  {[6, 12, 24].map((n) => (
-                    <option key={n} value={n}>
-                      {n} months
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            <label>
-              Loan purpose
-              <input
-                value={form.purpose}
-                onChange={(e) => field("purpose", e.target.value)}
-                minLength={5}
-                maxLength={500}
-                required
-              />
-            </label>
-            <h3 className="form-section">Financial information</h3>
-            <div className="form-row">
-              <label>
-                Average monthly revenue ($)
-                <input
-                  type="number"
-                  min={1}
-                  max={10000000}
-                  step="0.01"
-                  value={form.monthlyRevenue / 100 || ""}
-                  onChange={(e) => field("monthlyRevenue", e.target.value)}
-                  required
-                />
-              </label>
-              <label>
-                Monthly operating expenses ($)
-                <input
-                  type="number"
-                  min={0}
-                  max={10000000}
-                  step="0.01"
-                  value={form.monthlyExpenses / 100}
-                  onChange={(e) => field("monthlyExpenses", e.target.value)}
-                  required
-                />
-              </label>
-            </div>
-            <div className="form-row">
-              <label>
-                Existing monthly debt payments ($)
-                <input
-                  type="number"
-                  min={0}
-                  max={10000000}
-                  step="0.01"
-                  value={form.monthlyDebt / 100}
-                  onChange={(e) => field("monthlyDebt", e.target.value)}
-                  required
-                />
-              </label>
-              <div className="cash-preview" aria-live="polite">
-                <span>Monthly cash after expenses &amp; debt</span>
-                <strong>
-                  {money(
-                    form.monthlyRevenue -
-                      form.monthlyExpenses -
-                      form.monthlyDebt,
-                  )}
-                </strong>
+              <div className="form-row">
+                <label>
+                  Years operating
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    step="0.1"
+                    value={form.yearsOperating}
+                    onChange={(e) => field("yearsOperating", e.target.value)}
+                    required
+                  />
+                </label>
               </div>
             </div>
-            <label>
-              Additional financial notes
-              <textarea
-                value={form.notes}
-                onChange={(e) => field("notes", e.target.value)}
-                maxLength={2000}
-                rows={2}
-              />
-            </label>
+            <div className="form-section">
+              <h3>Loan details</h3>
+              <p className="section-note">
+                How much you need, for how long, and what it pays for. Principal
+                and interest are repaid in one payment at the end of the term.
+              </p>
+              <div className="form-row">
+                <label>
+                  Requested amount (USD)
+                  <input
+                    type="number"
+                    min={1000}
+                    max={100000}
+                    step={100}
+                    value={form.amount / 100}
+                    onChange={(e) => field("amount", e.target.value)}
+                    required
+                  />
+                  <span className="field-hint">
+                    $1,000–$100,000 in $100 increments.
+                  </span>
+                </label>
+                <label>
+                  Loan term
+                  <select
+                    value={form.termMonths}
+                    onChange={(e) => field("termMonths", e.target.value)}
+                  >
+                    {[6, 12, 24].map((n) => (
+                      <option key={n} value={n}>
+                        {n} months
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <label>
+                Purpose
+                <input
+                  value={form.purpose}
+                  onChange={(e) => field("purpose", e.target.value)}
+                  minLength={5}
+                  maxLength={500}
+                  placeholder="e.g. Replace a commercial oven"
+                  required
+                />
+              </label>
+            </div>
+            <div className="form-section">
+              <h3>Financial information</h3>
+              <p className="section-note">
+                Average monthly figures. Underwriting uses them to estimate how
+                much cash remains each month to set aside for repayment.
+              </p>
+              <div className="form-row three">
+                <label>
+                  Revenue (USD/mo)
+                  <input
+                    type="number"
+                    min={1}
+                    max={10000000}
+                    step="0.01"
+                    value={form.monthlyRevenue / 100 || ""}
+                    onChange={(e) => field("monthlyRevenue", e.target.value)}
+                    required
+                  />
+                </label>
+                <label>
+                  Expenses (USD/mo)
+                  <input
+                    type="number"
+                    min={0}
+                    max={10000000}
+                    step="0.01"
+                    value={form.monthlyExpenses / 100}
+                    onChange={(e) => field("monthlyExpenses", e.target.value)}
+                    required
+                  />
+                </label>
+                <label>
+                  Existing debt (USD/mo)
+                  <input
+                    type="number"
+                    min={0}
+                    max={10000000}
+                    step="0.01"
+                    value={form.monthlyDebt / 100}
+                    onChange={(e) => field("monthlyDebt", e.target.value)}
+                    required
+                  />
+                </label>
+              </div>
+              {form.monthlyRevenue > 0 && (
+                <p className="small muted">
+                  Revenue less expenses and existing debt:{" "}
+                  <strong>{money(cashAfterCosts)}</strong> per month (your
+                  inputs, before the new loan).
+                </p>
+              )}
+              <label>
+                Additional financial notes (optional)
+                <textarea
+                  value={form.notes}
+                  onChange={(e) => field("notes", e.target.value)}
+                  maxLength={2000}
+                  rows={2}
+                />
+              </label>
+            </div>
             <p className="small muted">
-              Use synthetic financial inputs only. Eligibility requires at least
-              1.25× cash-reserve coverage and one year of operations. An
-              assessment needing review is not automatically listed.
+              Eligibility requires at least 1.25× cash-reserve coverage and one
+              year of operations. An application needing review is not listed
+              until a demo operator approves it. A marketplace listing is not a
+              loan approval.
             </p>
-            <button
-              className="primary large"
-              disabled={
-                busy || state.users[state.currentUserId!].role !== "borrower"
-              }
-            >
-              {busy ? "Submitting…" : "Submit for Underwriting"}
-            </button>
+            <div className="form-actions">
+              <button className="primary large" disabled={busy || !isBorrower}>
+                {busy ? "Processing…" : "Submit for Underwriting"}
+              </button>
+            </div>
           </form>
         </section>
         <div className="stacked">
@@ -248,38 +286,23 @@ export default function BorrowPage() {
           ) : (
             <section className="panel">
               <h2>What happens next</h2>
-              <ol className="timeline preview">
-                {[
-                  ["Application submitted", "Saved in this browser."],
-                  [
-                    "Financial analysis",
-                    "Cash availability and ratios calculated.",
-                  ],
-                  [
-                    "Additional verification",
-                    "Paid credit data only if AP4M is connected.",
-                  ],
-                  [
-                    "Underwriting assessment",
-                    "Risk factors, gaps, and a preliminary recommendation.",
-                  ],
-                  [
-                    "Marketplace eligibility",
-                    "Eligible requests are listed for investor bids.",
-                  ],
-                ].map(([t, d], i) => (
-                  <li key={t}>
-                    <span className="step-number">{i + 1}</span>
-                    <div>
-                      <strong>{t}</strong>
-                      <p>{d}</p>
-                    </div>
-                  </li>
-                ))}
+              <ol className="simple-list">
+                <li>
+                  Your application is saved and an underwriting job starts.
+                </li>
+                <li>
+                  Deterministic rules calculate cash availability and coverage
+                  ratios.
+                </li>
+                <li>Eligible loans appear in the investor marketplace.</li>
+                <li>
+                  Applications needing review wait for demo-operator approval.
+                </li>
               </ol>
               <p className="callout">
-                AWS and paid credit data are optional. No AI invocation or
-                payment is claimed when they are not configured.
+                AI underwriting (AWS) and paid credit data (Mastercard AP4M) are
+                shown only when those services are actually connected. No AI
+                call or payment is claimed otherwise.
               </p>
             </section>
           )}
@@ -291,13 +314,14 @@ export default function BorrowPage() {
                   className="link-button"
                   onClick={() => navigate("/dashboard")}
                 >
-                  Dashboard
+                  View dashboard →
                 </button>
               </div>
               {applications.map((a) => (
                 <button
                   className="application-select"
                   key={a.id}
+                  aria-current={a.id === id ? "true" : undefined}
                   onClick={() => setSelected(a.id)}
                 >
                   <span>{a.businessName}</span>

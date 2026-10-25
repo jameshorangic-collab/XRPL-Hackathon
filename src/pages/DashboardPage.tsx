@@ -9,6 +9,7 @@ import {
   money,
   percent,
   title,
+  positionLabel,
 } from "../components/ui";
 import { availableToBid, reservedBalance } from "../domain/marketplace";
 import { termInterest } from "../domain/underwriting";
@@ -17,8 +18,8 @@ import { navigate } from "../router";
 import DemoControls from "../components/DemoControls";
 import IntegrationPanel from "../components/IntegrationPanel";
 import LegacyChainPanel from "../components/LegacyChainPanel";
-import WalletPanel from "../components/WalletPanel";
 import IntegrationEvidence from "../components/IntegrationEvidence";
+import WalletPanel from "../components/WalletPanel";
 export default function DashboardPage() {
   const { state } = useApp();
   const user = state.users[state.currentUserId!];
@@ -29,12 +30,6 @@ export default function DashboardPage() {
   const commitments = Object.values(state.commitments).filter(
     (c) => c.userId === user.id,
   );
-  const settledResults = commitments.flatMap((c) => {
-    const d = state.settlements[c.opportunityId]?.distributions.find(
-      (d) => d.bidId === c.bidId,
-    );
-    return d ? [d.principal + d.interest - c.amount] : [];
-  });
   const transactions = state.transactions
     .filter((t) => t.userId === user.id)
     .slice()
@@ -45,10 +40,12 @@ export default function DashboardPage() {
         title="Dashboard"
         description={`Your ${user.role} activity. All application and investment records are demo data.`}
       >
-        <Badge>
+        <Badge tone="info">
           {user.role === "borrower" ? "Borrower view" : "Investor view"}
         </Badge>
       </PageTitle>
+      <IntegrationPanel />
+      <IntegrationEvidence />
       {user.role === "borrower" ? (
         <>
           <div className="stats three">
@@ -179,9 +176,10 @@ export default function DashboardPage() {
       ) : (
         <>
           <div className="stats four">
+            <Stat label="Bids submitted" value={bids.length} />
             <Stat
-              label="Active bids"
-              value={bids.filter((b) => b.status === "active").length}
+              label="Simulated cash balance"
+              value={money(user.cashBalance)}
             />
             <Stat
               label="Unreserved buying capacity"
@@ -197,24 +195,21 @@ export default function DashboardPage() {
                 ),
               )}
             />
-            <Stat
-              label="Realized P/L · simulated"
-              value={
-                settledResults.length
-                  ? money(sum(settledResults), true)
-                  : "None settled"
-              }
-            />
           </div>
           <p className="small muted">
-            Simulated cash balance {money(user.cashBalance)}.{" "}
             {money(reservedBalance(state, user.id))} is reserved by your
             outstanding bids. Cash and reservations are simulated, not wallet
             token balances.
           </p>
           <section className="panel">
             <div className="section-heading">
-              <h2>Your bids</h2>
+              <div>
+                <h2>Your bids</h2>
+                <p className="section-note">
+                  A bid reserves part of your balance until capital clearing
+                  selects it and you commit funding.
+                </p>
+              </div>
               <button className="primary" onClick={() => navigate("/invest")}>
                 Browse investments
               </button>
@@ -238,10 +233,30 @@ export default function DashboardPage() {
                           {state.portfolios[b.opportunityId]?.name ??
                             state.loans[b.opportunityId]?.loan.business}
                         </td>
-                        <td>{title(b.tranche)}</td>
+                        <td>{positionLabel(b.tranche)}</td>
                         <td>{money(b.amount)}</td>
-                        <td>{percent(b.rateBps)}</td>
-                        <td>{title(b.status)}</td>
+                        <td>{percent(b.rateBps)} / yr</td>
+                        <td>
+                          <Badge
+                            tone={
+                              Object.values(state.commitments).some(
+                                (c) => c.bidId === b.id,
+                              )
+                                ? "good"
+                                : b.status === "awarded"
+                                  ? "info"
+                                  : b.status === "active"
+                                    ? "neutral"
+                                    : "warning"
+                            }
+                          >
+                            {Object.values(state.commitments).some(
+                              (c) => c.bidId === b.id,
+                            )
+                              ? "Committed · simulated"
+                              : title(b.status)}
+                          </Badge>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -253,6 +268,11 @@ export default function DashboardPage() {
           </section>
           <section className="panel">
             <h2>Your committed investments</h2>
+            <p className="section-note">
+              Capital you have committed (simulated). Expected payments assume
+              the borrowers repay in full; returns are not guaranteed and losses
+              follow repayment priority.
+            </p>
             {commitments.length ? (
               <div className="table-scroll">
                 <table>
@@ -279,7 +299,7 @@ export default function DashboardPage() {
                             {state.portfolios[c.opportunityId]?.name ??
                               state.loans[c.opportunityId]?.loan.business}
                             <small>
-                              {title(c.tranche)} · Simulated Commitment
+                              {positionLabel(c.tranche)} · Simulated Commitment
                             </small>
                           </td>
                           <td>{money(c.amount)}</td>
@@ -326,6 +346,10 @@ export default function DashboardPage() {
       )}
       <section className="panel">
         <h2>Transaction history</h2>
+        <p className="section-note">
+          Every movement of your simulated balance. Simulated activity never has
+          a blockchain transaction hash.
+        </p>
         {transactions.length ? (
           <div className="table-scroll">
             <table>
@@ -344,7 +368,9 @@ export default function DashboardPage() {
                     <td>{dateTime(t.createdAt)}</td>
                     <td>{t.label}</td>
                     <td>
-                      <Badge>{t.mode}</Badge>
+                      <Badge tone={t.mode === "simulated" ? "warning" : "good"}>
+                        {title(t.mode)}
+                      </Badge>
                     </td>
                     <td>{money(t.amount, true)}</td>
                     <td>
@@ -366,10 +392,9 @@ export default function DashboardPage() {
           </Empty>
         )}
       </section>
-      <IntegrationPanel />
-      <IntegrationEvidence />
-      <WalletPanel />
+      <h2 className="tools-heading">Developer & demo tools</h2>
       <DemoControls />
+      <WalletPanel />
       <LegacyChainPanel />
     </main>
   );

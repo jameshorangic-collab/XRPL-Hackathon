@@ -16,6 +16,8 @@ export const money = (v: number, precise = false) =>
 export const percent = (bps: number) => `${(bps / 100).toFixed(2)}%`;
 export const title = (s: string) =>
   s.replaceAll("_", " ").replace(/^./, (c) => c.toUpperCase());
+export const positionLabel = (t: string) =>
+  t === "whole" ? "Whole loan" : title(t);
 export const dateTime = (s: string) =>
   new Date(s).toLocaleString("en-US", {
     timeZone: "America/New_York",
@@ -32,6 +34,20 @@ export function Badge({
   tone?: string;
 }) {
   return <span className={`badge ${tone}`}>{children}</span>;
+}
+/** Integration status with a colored dot. Only "Connected" renders green. */
+export function StatusPill({ status }: { status: string }) {
+  const cls =
+    status === "Connected"
+      ? "connected"
+      : status === "Error"
+        ? "error"
+        : status === "Demo mode"
+          ? "demo"
+          : status === "Pending"
+            ? "pending"
+            : "";
+  return <span className={`status-pill ${cls}`}>{status}</span>;
 }
 export function PageTitle({
   title: heading,
@@ -67,7 +83,9 @@ export function FundingProgress({
   return (
     <div className="funding">
       <div>
-        <span>Simulated funding</span>
+        <span title="Simulated commitments">
+          {total ? Math.floor((committed * 100) / total) : 0}% committed
+        </span>
         <strong>
           {money(committed)} / {money(total)}
         </strong>
@@ -128,8 +146,7 @@ export function StructureTable({
       <p className="small muted">
         Projected financing cost:{" "}
         <strong>{money(s.projectedCost, true)}</strong> over {s.termMonths}{" "}
-        months, including {money(s.fee, true)} projected fees. Principal is not
-        counted twice.
+        months, including {money(s.fee, true)} in projected fees.
       </p>
     </>
   );
