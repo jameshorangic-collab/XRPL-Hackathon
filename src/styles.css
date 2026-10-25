@@ -40,7 +40,7 @@
   --radius-sm: 9px;
   --shadow: 0 1px 2px rgb(60 45 25 / 5%), 0 8px 24px rgb(60 45 25 / 6%);
   --shadow-lg: 0 30px 80px rgb(60 45 25 / 16%), 0 2px 6px rgb(60 45 25 / 6%);
-  --head: "Libre Caslon Text", Georgia, serif;
+  --head: Lora, Georgia, serif;
   --tint-1: #f3eee4;
   --tint-2: #e6dccb;
   --scroll: 0;
