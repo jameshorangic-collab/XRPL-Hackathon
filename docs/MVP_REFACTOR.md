@@ -1,3 +1,5 @@
+> Historical four-page refactor report. Current live sponsor integration results are in [FINAL_STATUS](FINAL_STATUS.md).
+
 # BACKSTOP v0.2 refactor report
 
 Built October 25, 2026. Source branch: `feat/four-page-mvp`.

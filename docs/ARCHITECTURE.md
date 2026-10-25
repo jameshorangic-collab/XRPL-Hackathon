@@ -1,3 +1,5 @@
+> The v0.3 backend implementation and current service boundaries are documented in [INTEGRATIONS](INTEGRATIONS.md). The preserved v0.2 frontend architecture follows.
+
 # Architecture
 
 BACKSTOP v0.2 uses React 19, TypeScript, and Vite. Exactly four application routes are handled by `src/router.ts` and `src/App.tsx`: signup, borrow, invest, and dashboard. Account creation and role switching are demo conveniences, not authorization.
