@@ -1,13 +1,3 @@
-/* ABC Areal (Dinamo, free license) is used when installed locally;
-   add its woff2 from public/fonts here once downloaded; Figtree is the fallback. */
-@font-face {
-  font-family: "ABC Areal";
-  src:
-    local("ABC Areal"),
-    local("ABCAreal-Regular");
-  font-weight: 100 900;
-  font-display: swap;
-}
 :root {
   --bg: #f3eee4;
   --surface: rgb(255 253 248 / 82%);
@@ -53,8 +43,7 @@
   --tint-1: #f3eee4;
   --tint-2: #e6dccb;
   --scroll: 0;
-  font-family:
-    "ABC Areal", Areal, Figtree, ui-sans-serif, system-ui, sans-serif;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
   color: var(--ink);
   background: var(--bg);
   font-synthesis: none;
