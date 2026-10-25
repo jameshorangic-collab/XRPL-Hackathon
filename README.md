@@ -4,6 +4,10 @@
 
 The default opportunity begins with an unfunded risk layer. Load the competitive market to clear an $80,000 senior / $15,000 junior / $5,000 retained stack. Quoted investor rates determine the winner. A separate Solidity facility enforces actual local token commitments and a maturity payment waterfall.
 
+## Hosted demo
+
+Open **https://backstop-xrpl.vercel.app**. Clearing and browser simulations work on the hosted site. The genuine local EVM lifecycle still requires a local node. This deployment is uploaded directly and is not linked to automatic GitHub deployments; see [deployment details](docs/DEPLOYMENT.md).
+
 ## Run
 
 Requires Node.js 22.19 or a current supported LTS release (verified with Node 24.7) and npm.

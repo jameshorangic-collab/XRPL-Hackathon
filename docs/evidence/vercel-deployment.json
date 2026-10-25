@@ -1,0 +1,58 @@
+{
+  "verifiedAtUTC": "2026-10-25T03:47:32.698514+00:00",
+  "url": "https://backstop-xrpl.vercel.app",
+  "dashboard": "https://vercel.com/horangic/backstop-xrpl",
+  "method": "Vercel Drop to Deploy; compiled dist ZIP uploaded through native file picker",
+  "sourceCommit": "74fd70062ddfed03cfe5aa2b29c1f000fbeb67d3",
+  "sourceBranch": "feat/backstop-prototype",
+  "gitAutoDeploy": false,
+  "checks": [
+    {
+      "path": "index.html",
+      "status": 200,
+      "bytes": 375,
+      "sha256": "4a4c0f8669693d4f2a83eacf888cd72fff726824a5917c58d43574a4a7a96d76",
+      "matchesLocalBuild": true
+    },
+    {
+      "path": "contracts/MockUSD.json",
+      "status": 200,
+      "bytes": 8891,
+      "sha256": "6f70de42d25a19711970f44dd097f0b3a1c1e32aceb736cc5141023406f570b0",
+      "matchesLocalBuild": true
+    },
+    {
+      "path": "contracts/BackstopFacility.json",
+      "status": 200,
+      "bytes": 22172,
+      "sha256": "4f523fc2c8743a57271955a77566f3b4f37d1ccd0efc44e8bba552d1f64f73f2",
+      "matchesLocalBuild": true
+    },
+    {
+      "path": "assets/index-BnVSFoHB.css",
+      "status": 200,
+      "bytes": 29175,
+      "sha256": "f359f8abf7046a448fb5525bbf5b3ed3cef772b9fe8f2a9679bbdeaf2665ff70",
+      "matchesLocalBuild": true
+    },
+    {
+      "path": "assets/chain-iqxh6Q7w.js",
+      "status": 200,
+      "bytes": 254769,
+      "sha256": "82263852b9abecfb913475a4425936db7a334ee634fbda1233bb904df2cd2e23",
+      "matchesLocalBuild": true
+    },
+    {
+      "path": "assets/index-RF-hUZNN.js",
+      "status": 200,
+      "bytes": 285712,
+      "sha256": "f140c0af7ff98e857f5c001b874339a388bedd0232d86db239ca109b854c294b",
+      "matchesLocalBuild": true
+    }
+  ],
+  "browserChecks": [
+    "unfunded scenario rejected",
+    "competitive scenario cleared at $9500.37 projected annual cost"
+  ],
+  "blockchain": "Local chain only; no public testnet deployment"
+}
