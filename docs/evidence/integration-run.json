@@ -1,0 +1,65 @@
+[
+  {
+    "kind": "ap4m-payout",
+    "created": "2026-10-25T16:19:36.203Z",
+    "applicationId": "dffa2149-1edf-49e1-a35d-93fe3b9e1ccb",
+    "settled": true,
+    "payoutHash": "0xa5932aceb622d50bc1868bc4088b87d96efc6dcf0ead92ebb631efbd637b07ba",
+    "redemptionHash": "0x01e4df46fe7f04147eabd8226576109070982e1acb298a2dc05d9f6a01a6a00f",
+    "channelId": "0x5581e5dd8bac0f5756de6851e0b938b3413ad34b794fee821ea81de67b242dea",
+    "claimId": "0x3c26424964d54403131fcfe6c7555f5b817ddd3d6542b7a444ecefb3e6d08eea",
+    "amountWei": "10000000000000000",
+    "token": "0x27b57a9D0b8d24EB97259c4E2279e45255e016f3",
+    "payout": "0x6B0dc1580B7b14E0Bd35bbdDF6fbFDb536E7ef3c",
+    "verifiedBy": "QuickNode",
+    "blockNumber": 9235872
+  },
+  {
+    "kind": "aws",
+    "created": "2026-10-25T15:58:08.431Z",
+    "applicationId": "dffa2149-1edf-49e1-a35d-93fe3b9e1ccb",
+    "provider": "aws-agentcore",
+    "invocationId": "1b60f00b-46da-4bfa-9dd4-66a4bc46be6a",
+    "sessionId": "08d48198-1756-4f02-9616-b7d4f3e88c1a",
+    "region": "us-east-2",
+    "harnessArn": "arn:aws:bedrock-agentcore:us-east-2:141023342618:harness/harness_3gvmy-D1P2aCSQOX",
+    "at": "2026-10-25T15:58:08.431Z",
+    "reportUsed": true
+  },
+  {
+    "kind": "ap4m",
+    "created": "2026-10-25T15:58:06.160Z",
+    "applicationId": "dffa2149-1edf-49e1-a35d-93fe3b9e1ccb",
+    "requestId": "report-dffa2149-1edf-49e1-a35d-93fe3b9e1ccb",
+    "channelId": "0x5581e5dd8bac0f5756de6851e0b938b3413ad34b794fee821ea81de67b242dea",
+    "amountRlusd": "0.01",
+    "redemptionHash": "0x01e4df46fe7f04147eabd8226576109070982e1acb298a2dc05d9f6a01a6a00f",
+    "settled": false,
+    "verifiedBy": "QuickNode",
+    "chainId": 1449000
+  },
+  {
+    "kind": "aws",
+    "created": "2026-10-25T15:55:00.986Z",
+    "applicationId": "dffa2149-1edf-49e1-a35d-93fe3b9e1ccb",
+    "provider": "aws-agentcore",
+    "invocationId": "7fe7bacc-c5f2-426f-a377-94eaefc5ac89",
+    "sessionId": "07cba5ac-621f-4d03-8ec5-b09c40a2deb5",
+    "region": "us-east-2",
+    "harnessArn": "arn:aws:bedrock-agentcore:us-east-2:141023342618:harness/harness_3gvmy-D1P2aCSQOX",
+    "at": "2026-10-25T15:55:00.986Z",
+    "reportUsed": false
+  },
+  {
+    "kind": "aws",
+    "created": "2026-10-25T15:43:31.507Z",
+    "applicationId": "68b860a5-b11a-43f8-a8f4-f3012df63880",
+    "provider": "aws-agentcore",
+    "invocationId": "96613178-2b14-43c8-ae23-85e9a8a9614e",
+    "sessionId": "dfc82b88-c0f8-49e3-9b7f-8958f986a099",
+    "region": "us-east-2",
+    "harnessArn": "arn:aws:bedrock-agentcore:us-east-2:141023342618:harness/harness_3gvmy-D1P2aCSQOX",
+    "at": "2026-10-25T15:43:31.507Z",
+    "reportUsed": false
+  }
+]

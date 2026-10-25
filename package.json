@@ -1,7 +1,7 @@
 {
   "name": "backstop",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
@@ -15,14 +15,31 @@
     "verify:tx": "node --env-file-if-exists=.env scripts/verify-transaction.mjs",
     "demo": "node scripts/demo.mjs",
     "typecheck": "tsc -b",
-    "format": "prettier --write src scripts test *.cjs *.js *.ts"
+    "format": "prettier --write src scripts test *.cjs *.js *.ts",
+    "api": "tsx --env-file-if-exists=.env server/index.ts",
+    "dev:full": "node scripts/dev-full.mjs",
+    "ap4m:worker": "node --env-file-if-exists=.env server/ap4m-worker.mjs",
+    "demo:seed": "tsx --env-file-if-exists=.env scripts/backend-demo.ts seed",
+    "demo:reset": "tsx --env-file-if-exists=.env scripts/backend-demo.ts reset",
+    "demo:check": "tsx --env-file-if-exists=.env scripts/backend-demo.ts check",
+    "demo:aws": "tsx --env-file-if-exists=.env scripts/backend-demo.ts aws",
+    "start:local": "tsx --env-file-if-exists=.env server/index.ts",
+    "dev:offline": "node scripts/dev-full.mjs --offline"
   },
   "dependencies": {
+    "@ap4m/sdk": "https://hackathon.ap4m.build/sdk/ap4m-sdk.tgz",
+    "@aws-sdk/client-bedrock-agentcore": "^3.1156.0",
+    "@aws-sdk/client-bedrock-agentcore-control": "^3.1156.0",
+    "@aws-sdk/client-bedrock-runtime": "^3.1156.0",
+    "@aws-sdk/client-sts": "^3.1156.0",
+    "@aws-sdk/credential-providers": "^3.1156.0",
+    "@libsql/client": "^0.18.0",
     "@openzeppelin/contracts": "^5.6.1",
     "ethers": "^6.17.0",
     "lucide-react": "^0.468.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "tsx": "^4.23.15"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",

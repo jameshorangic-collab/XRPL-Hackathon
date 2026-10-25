@@ -16,6 +16,8 @@ import { assessDeterministically, validateApplication } from "./underwriting";
 import { clearPortfolio, clearWholeLoan, settleCapital } from "./marketFinance";
 import { sum } from "./finance";
 import { validDate } from "./validation";
+import { assessmentWithReport } from "./cashflowReport";
+import { attachBakeryPortfolio, isBakeryDemo } from "../data/bakeryDemo";
 export type Context = {
   id: () => string;
   now: () => string;
@@ -154,7 +156,9 @@ export function completeAssessment(
   const app = state.applications[assessment.applicationId];
   if (!app) throw new Error("Application no longer exists.");
   if (state.assessments[app.id]) return state;
-  const expected = assessDeterministically(app, assessment.createdAt);
+  const expected = assessment.cashflowReport
+    ? assessmentWithReport(app, assessment.cashflowReport)
+    : assessDeterministically(app, assessment.createdAt);
   if (
     [
       "cashAvailable",
@@ -228,6 +232,7 @@ function publish(
     createdAt: ctx.now(),
     operatorApproval: approval,
   };
+  if (isBakeryDemo(app)) attachBakeryPortfolio(s, s.loans[id]);
 }
 export function approveForDemo(
   state: AppState,
@@ -260,12 +265,39 @@ export function updateReport(
     throw new Error("Application not found.");
   const previous = state.reports[result.applicationId];
   if (previous?.mode === "live" && previous.status === "Report received")
-    return state;
+    if (result.mode !== "live" || result.paymentHash !== previous.paymentHash)
+      return state;
   if (result.mode !== "live" && result.paymentHash)
     throw new Error("Synthetic reports cannot contain payment hashes.");
   const s = copy(state);
   s.reports[result.applicationId] = result;
   return s;
+}
+export function reviseAssessment(
+  state: AppState,
+  assessment: Assessment,
+  ctx = defaultContext,
+): AppState {
+  const app = state.applications[assessment.applicationId];
+  if (!app) throw new Error("Application not found.");
+  const listingId = `listing-${app.id}`;
+  const old = state.loans[listingId];
+  const opportunityId = old?.portfolioId ?? listingId;
+  if (state.plans[opportunityId]?.locked)
+    throw new Error(
+      "This opportunity has locked commitments. Report evidence is retained; its accepted financing terms cannot be changed.",
+    );
+  const s = copy(state);
+  delete s.assessments[app.id];
+  delete s.loans[listingId];
+  if (old?.portfolioId) {
+    delete s.portfolios[old.portfolioId];
+    delete s.plans[old.portfolioId];
+  }
+  for (const b of Object.values(s.bids))
+    if (b.opportunityId === opportunityId && b.status === "active")
+      b.status = "closed";
+  return completeAssessment(s, assessment, ctx);
 }
 export function commitmentTotal(s: AppState, opportunityId: string) {
   return (
@@ -325,6 +357,10 @@ export function submitBid(
   if (u.role !== "investor")
     throw new Error("Switch to the investor demo role to submit a bid.");
   const principal = principalFor(state, input.opportunityId);
+  if (state.loans[input.opportunityId]?.portfolioId)
+    throw new Error(
+      "This loan is included in a portfolio and cannot be financed twice. Bid on its portfolio instead.",
+    );
   if (!principal || opportunityStatus(state, input.opportunityId) !== "open")
     throw new Error("This opportunity is not accepting bids.");
   if (state.plans[input.opportunityId]?.locked)

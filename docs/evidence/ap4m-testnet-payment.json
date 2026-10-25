@@ -1,0 +1,41 @@
+{
+  "verifiedAt": "2026-10-25T16:06:55.402Z",
+  "proof": {
+    "settled": true,
+    "payoutHash": "0xa5932aceb622d50bc1868bc4088b87d96efc6dcf0ead92ebb631efbd637b07ba",
+    "redemptionHash": "0x01e4df46fe7f04147eabd8226576109070982e1acb298a2dc05d9f6a01a6a00f",
+    "channelId": "0x5581e5dd8bac0f5756de6851e0b938b3413ad34b794fee821ea81de67b242dea",
+    "claimId": "0x3c26424964d54403131fcfe6c7555f5b817ddd3d6542b7a444ecefb3e6d08eea",
+    "amountWei": "10000000000000000",
+    "token": "0x27b57a9D0b8d24EB97259c4E2279e45255e016f3",
+    "payout": "0x6B0dc1580B7b14E0Bd35bbdDF6fbFDb536E7ef3c",
+    "verifiedBy": "QuickNode",
+    "blockNumber": 9235872
+  },
+  "receipt": {
+    "hash": "0x01e4df46fe7f04147eabd8226576109070982e1acb298a2dc05d9f6a01a6a00f",
+    "chainId": 1449000,
+    "status": 1,
+    "blockNumber": 9235839,
+    "blockHash": "0xacca8c90bad744a0586452e62501dd2eaa02ad850fef1b646d640d6635b6f541",
+    "confirmations": 99,
+    "from": "0xAdAFA40c9c9b87Fa52ea898Cbb74aCeA6fc2f94A",
+    "to": "0xcAB42800A5ECF0D253Fa2581Bb3334B4DAEfaE91",
+    "gasUsed": "164187",
+    "explorerUrl": "https://explorer.testnet.xrplevm.org/tx/0x01e4df46fe7f04147eabd8226576109070982e1acb298a2dc05d9f6a01a6a00f",
+    "logs": [
+      {
+        "address": "0xcAB42800A5ECF0D253Fa2581Bb3334B4DAEfaE91",
+        "topics": [
+          "0xe3de5c3755abd99a01530fd79b85708f309453f6d26eb9bb5dde4c14cd5f7175",
+          "0x5581e5dd8bac0f5756de6851e0b938b3413ad34b794fee821ea81de67b242dea",
+          "0x3c26424964d54403131fcfe6c7555f5b817ddd3d6542b7a444ecefb3e6d08eea",
+          "0x5d51997782633116d26a30e4cf1ec144247a4dc6c29cfc318b8a846837f445f6"
+        ],
+        "data": "0x70894300884a70bb1603b1204dc8f4b46e55af2b976f97ff12a4008161dbf1fb000000000000000000000000adafa40c9c9b87fa52ea898cbb74acea6fc2f94ac07536c3085894425ca4015bf1bd34b596d039611148ce0eb58d776357d340f90000000000000000000000006b0dc1580b7b14e0bd35bbddf6fbfdb536e7ef3c000000000000000000000000adafa40c9c9b87fa52ea898cbb74acea6fc2f94a0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002386f26fc10000000000000000000000000000000000000000000000000000002386f26fc10000",
+        "index": 0
+      }
+    ],
+    "verifiedBy": "QuickNode"
+  }
+}

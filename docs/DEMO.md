@@ -1,20 +1,14 @@
-# Four-page demo walkthrough
+# Three-minute recording script
 
-Run `npm ci` and `npm run dev`, or open https://backstop-xrpl.vercel.app. New visitors start at `/signup`. Every figure is synthetic; no wallet is needed.
+Prepare first: `npm ci && npm run build`, then `npm run start:local` and, in a second terminal, `npm run ap4m:worker`. `npm run demo:check` should show actual service health. Use the stable http://127.0.0.1:3001 app while signing. Keep MetaMask Account 2 on chain 1449000 and ready to confirm. Never show private `.env`, recovery phrases, SDK retained signatures, or RPC URLs.
 
-1. Create a borrower demo profile with a synthetic name/email. Request Loan opens.
-2. Click **Fill synthetic example** and **Submit for Underwriting**. The saved $10,000 Alder Design Studio application shows its unique ID and underwriting timeline. Deterministic ratios yield $9,000 available cash, a $933.34 monthly reserve, and 9.64× coverage. It is eligible and listed. No AI was invoked.
-3. **View synthetic report** explicitly shows no payment; AP4M remains unconfigured. Refresh and confirm the application persists.
-4. Account → create a separate investor profile. Invest → Alder → **View / Invest**. Submit a $10,000 whole-loan bid at 8%. Clearing becomes feasible; funded capital is still zero.
-5. Separately click **Commit Funding · simulated**. Funding becomes $10,000/$10,000. Dashboard records the position and a simulated transaction with no hash. Refresh preserves the investment.
-6. Dashboard → expand **Development / demo controls**. Choose Alder, leave Performing selected, and **Simulate final repayment / default**. The full $10,800 is credited once. Further final settlement is disabled.
-7. **Load diversified portfolio** adds reproducible competing senior/mezzanine/junior bids. Invest → Loan Portfolios → view the pool. Selected capital is $80k senior / $10k mezzanine / $5k junior / $5k retained. Projected funding cost is $8,975.37. Funded progress counts commitments, not quotes.
-8. In the separate demo controls, **Fund selected bids · simulation** debits each synthetic profile and originator. Test Moderate or Severe default previews, then record final simulated settlement once. Cash reconciles, with fees and senior/mezzanine coupons ahead of lower-ranked payouts.
+1. **0:00–0:25:** Signup as a fictional borrower. Request Loan → Load Demo Bakery. Point out $10,000 request, $18,000 monthly revenue, $13,000 expenses, $1,500 existing debt. Submit.
+2. **0:25–1:10:** Show the AWS Harness and deterministic financial analysis. Explain $3,500 cash available and interest-inclusive $933.34 monthly reserve under the disclosed 12% demo cap. No contractual rate or real credit approval is claimed.
+3. **1:10–1:55:** AP4M receives a real x402 challenge for a synthetic cashflow report. Confirm the wallet prompts promptly. Existing channel is reused; first-time setup needs channel opening. Voucher costs 0.01 test RLUSD; resource binding is a separate signature, not a second payment. Confirm redemption gas transaction.
+4. **1:55–2:20:** Show report received, the real redemption hash, and verified merchant payout. Refresh payment evidence if payout is initially pending. AWS uses $17,800 observed deposits versus $18,000 reported revenue, 1.11% difference. Financial records are synthetic even though payment is real.
+5. **2:20–2:50:** Switch to Investor → Loan Portfolios → Harbor Bakery five-business pool. Show $35k senior + $8k mezzanine + $5k junior + $2k retention = $50k. Submit a bid and distinguish it from the separate simulated commitment.
+6. **2:50–3:00:** Dashboard evidence: genuine AWS request, AP4M redemption, merchant payout and QuickNode verification. State clearly that investor capital is simulated; the real transaction pays for the report.
 
-For competition, submit your own senior $80k at 7.9%, mezzanine $10k at 11.9%, and junior $5k at 15.9% before any commitment. All fit a fresh $100k simulated investor balance and beat fixture quotes, reducing projected cost to $8,880.37. Commit each individually, then fund the retained contribution using the labeled demo control.
+Wallet approvals and sponsor settlement can exceed three minutes. Prepare a channel before recording, keep the wallet open, and allow time rather than misrepresenting pending settlement. A dedicated authorized test key can remove interactive signing; the recorded implementation used human confirmations.
 
-For the review gate, submit a different synthetic business with only 0.5 years operating history. It stays Needs review and does not appear in Invest. Dashboard demo controls require selecting that application and entering an approval reason of at least ten characters before explicit demo approval can list it. The underlying assessment remains Needs review. Declined applications cannot use this bypass.
-
-Load example borrower/investor controls switch to reusable fixture profiles. Add synthetic loan publishes a labeled demo fixture. Reset demo state clears only this origin's v2 demo data and returns to signup; the old v1 prototype data is retained.
-
-The Dashboard developer tool preserves the original genuine local senior/junior EVM fixture. Run `npm run contracts:compile` then `npm run demo` locally to use it. Its transactions and time travel are restricted to loopback chain 31337; it does not fund the new simulated marketplace positions. It uses a mock USD token, not RLUSD. No real wallet transaction or external payment is needed for the four-page demo.
+Offline backup: `npm run dev:offline`, open the Vite URL, load the bakery, and show deterministic assessment, synthetic report, bids and repayment. Every fallback remains labeled. Seed Bakery Demo resets browser simulation; backend reset preserves real integration evidence. Do not reset a loan after accepting commitments if you intend to demonstrate that same funding lifecycle.

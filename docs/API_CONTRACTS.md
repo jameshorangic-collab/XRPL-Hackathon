@@ -1,3 +1,5 @@
+> Implemented in v0.3. See [INTEGRATIONS](INTEGRATIONS.md) and [FINAL_STATUS](FINAL_STATUS.md) for actual verification and remaining hosting requirements. The original interface specification follows; statements below describing future server work are historical.
+
 # Integration contracts
 
 These are BACKSTOP-owned typed gateway boundaries, not claims of deployed sponsor integrations. The repository includes client adapters and tests; the privileged server implementations remain future work. The default app starts with no credentials.

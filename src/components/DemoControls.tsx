@@ -16,6 +16,7 @@ import {
 import { navigate } from "../router";
 import { money, StressTable, title } from "./ui";
 import { settleCapital } from "../domain/marketFinance";
+import { seedBakeryDemo } from "../data/bakeryDemo";
 export default function DemoControls() {
   const { state, repository, action, busy } = useApp();
   const [selected, setSelected] = useState(
@@ -47,6 +48,17 @@ export default function DemoControls() {
         simulated cash and synthetic assets.
       </p>
       <div className="button-row">
+        <button
+          disabled={busy}
+          onClick={() =>
+            void action(async () => {
+              await repository.transact((s) => seedBakeryDemo(s));
+              navigate("/borrow");
+            }, "Bakery demo reset in this browser. Server payment and blockchain evidence are retained.")
+          }
+        >
+          Seed Bakery Demo
+        </button>
         <button
           disabled={busy}
           onClick={() =>

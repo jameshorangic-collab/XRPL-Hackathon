@@ -1,2 +1,2 @@
 import { defineConfig } from "vitest/config";
-export default defineConfig({ test: { environment: "node" } });
+export default defineConfig({ server:{host:'127.0.0.1',proxy:{'/api':'http://127.0.0.1:3001'}},test: { environment: "node" } });

@@ -16,7 +16,7 @@ import { MarketplaceService } from "../data/services";
 import type { AppState } from "../domain/marketTypes";
 import {
   DemoUnderwritingProvider,
-  AwsUnderwritingProvider,
+  ResilientUnderwritingProvider,
 } from "../integrations/aws-underwriting";
 import {
   UnconfiguredReportProvider,
@@ -100,9 +100,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
           detail: config.error,
         }))
       : integrationStatuses(base);
-  const awsConnected = statuses.some(
-    (s) => s.id === "aws" && s.status === "Connected",
-  );
   const ap4mConnected = statuses.some(
     (s) => s.id === "ap4m" && s.status === "Connected",
   );
@@ -110,14 +107,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     () =>
       new MarketplaceService(
         repository,
-        awsConnected
-          ? new AwsUnderwritingProvider(base)
+        base
+          ? new ResilientUnderwritingProvider(base)
           : new DemoUnderwritingProvider(),
         ap4mConnected
           ? new Ap4mReportProvider(base)
           : new UnconfiguredReportProvider(),
       ),
-    [repository, base, awsConnected, ap4mConnected],
+    [repository, base, ap4mConnected],
   );
   const notify = (text: string, error = false) => setMessage({ text, error });
   const action: Action = async (work, success) => {

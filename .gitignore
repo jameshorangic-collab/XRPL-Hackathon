@@ -9,3 +9,10 @@ typechain-types/
 .DS_Store
 *.tsbuildinfo
 .local-*.log
+
+.backstop/
+.env.*.local
+
+.vercel/
+.vercel
+.env*

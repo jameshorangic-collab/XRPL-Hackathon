@@ -47,3 +47,11 @@ At 70% principal recovery and zero collected interest on the three-layer fixture
 ## Risk assumptions
 
 Synthetic expected loss is the sum of principal × assumed PD × (1 − assumed recovery), with intermediate cents rounded down. It is separate from stressed loss, full possible exposure, promised coupons, and realized cash. No empirical dataset, validated default probability, loan ownership, servicing oracle, or regulatory capital treatment is established.
+
+## Harbor Bakery integration fixture
+
+The fictional $10,000 request reports $18,000 revenue, $13,000 operating expenses and $1,500 existing monthly debt, leaving $3,500 available. No contractual rate was supplied. The existing deterministic 12% indicative cap gives $1,200 annual simple interest and a $933.34 monthly bullet reserve (not an amortizing loan payment). Purchased report data is synthetic: $17,800 deposits, $12,900 outflows, one negative-balance day over six months, with recurring debt requiring reconciliation. A 1.11% deposit difference is within the disclosed 10% demo threshold. A discrepancy fixture with $11,000 deposits forces further review and removes the unfunded listing.
+
+After eligibility, the bakery becomes one constituent of a five-business $50,000 pool, and is excluded from individual-loan funding. Four other operator-approved synthetic loans are $10,000 each. Capital is $35,000 senior at 8%, $8,000 mezzanine at 12%, $5,000 junior at 16%, and $2,000 retained. Coupons $4,560 plus $286 projected collection fee produce $4,846 modeled financing cost. Retained principal is funded and counted once. This modifies fixture assumptions, not the solver.
+
+AP4M's actual 0.01 test RLUSD purchase is a separate report expense. It is never counted as $50,000 portfolio funding or a loan investment. Returns, credit losses and borrower financial data remain synthetic even though the report payment is genuine.

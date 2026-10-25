@@ -18,6 +18,7 @@ import DemoControls from "../components/DemoControls";
 import IntegrationPanel from "../components/IntegrationPanel";
 import LegacyChainPanel from "../components/LegacyChainPanel";
 import WalletPanel from "../components/WalletPanel";
+import IntegrationEvidence from "../components/IntegrationEvidence";
 export default function DashboardPage() {
   const { state } = useApp();
   const user = state.users[state.currentUserId!];
@@ -352,6 +353,7 @@ export default function DashboardPage() {
       </section>
       <DemoControls />
       <WalletPanel />
+      <IntegrationEvidence />
       <IntegrationPanel />
       <LegacyChainPanel />
     </main>

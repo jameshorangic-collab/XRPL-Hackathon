@@ -17,9 +17,9 @@ export default function InvestPage() {
   const { state } = useApp();
   const [tab, setTab] = useState<"loans" | "portfolios">("loans");
   const [selected, setSelected] = useState<string | null>(null);
-  const loans = Object.values(state.loans).sort((a, b) =>
-    b.createdAt.localeCompare(a.createdAt),
-  );
+  const loans = Object.values(state.loans)
+    .filter((l) => !l.portfolioId)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   const portfolios = Object.values(state.portfolios);
   return (
     <main>

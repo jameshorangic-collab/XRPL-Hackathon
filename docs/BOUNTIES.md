@@ -1,3 +1,5 @@
+> Historical v0.2 placeholder status. Current genuine AWS/AP4M/QuickNode/testnet evidence is in [BOUNTY_EVIDENCE](BOUNTY_EVIDENCE.md).
+
 # Sponsor integration status
 
 | Integration     | Delivered                                                                                                                    | Live limitation                                                                                                               |

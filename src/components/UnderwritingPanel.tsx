@@ -173,28 +173,71 @@ export default function UnderwritingPanel({
         )}
         {paid && (
           <p className="small">
-            Verified payment hash: <code>{report?.paymentHash}</code>
+            Confirmed AP4M redemption:{" "}
+            <a
+              href={`https://explorer.testnet.xrplevm.org/tx/${report?.paymentHash}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <code>{report?.paymentHash}</code>
+            </a>
+            .{" "}
+            {report?.settled
+              ? "Merchant RLUSD payout verified."
+              : "Merchant payout not yet verified."}
           </p>
         )}
         <div className="button-row">
+          {paid && !report?.settled && (
+            <button
+              disabled={busy}
+              onClick={() =>
+                void action(
+                  () => service.refreshPaymentEvidence(applicationId),
+                  "Payment evidence refreshed without creating another purchase.",
+                )
+              }
+            >
+              Refresh payment evidence
+            </button>
+          )}
           <button
             disabled={busy || report?.status === "Report received"}
             onClick={() =>
-              void action(
-                () => service.report(applicationId, new DemoReportProvider()),
-                "Synthetic report loaded. No payment was made.",
-              )
+              void action(async () => {
+                if (application.businessName === "Harbor Bakery")
+                  await service.syntheticCashflowReport(applicationId);
+                else
+                  await service.report(applicationId, new DemoReportProvider());
+              }, "Synthetic report loaded. No payment was made.")
             }
           >
             View synthetic report
           </button>
+          {application.businessName === "Harbor Bakery" && (
+            <button
+              disabled={busy || report?.mode === "live"}
+              onClick={() =>
+                void action(
+                  () =>
+                    service.syntheticCashflowReport(
+                      applicationId,
+                      "discrepancy",
+                    ),
+                  "Synthetic discrepancy report applied; no payment occurred.",
+                )
+              }
+            >
+              Test discrepancy · synthetic
+            </button>
+          )}
           <button
             disabled={
               busy ||
               !statuses.some(
                 (s) => s.id === "ap4m" && s.status === "Connected",
               ) ||
-              report?.status === "Report received"
+              (report?.mode === "live" && report?.status === "Report received")
             }
             onClick={() =>
               void action(

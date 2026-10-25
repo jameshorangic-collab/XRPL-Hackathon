@@ -8,6 +8,7 @@ import { navigate, useRoute, type Route } from "./router";
 import { switchProfileRole } from "./domain/marketplace";
 import { storageKey } from "./data/repository";
 import { createSeedState } from "./data/marketSeed";
+import IntegrationWalletBridge from "./components/IntegrationWalletBridge";
 class StartupBoundary extends Component<
   { children: ReactNode },
   { error: string }
@@ -125,6 +126,7 @@ function Application() {
         Synthetic applications and assessments. Marketplace funding is
         simulated. Demo profiles are not secure authentication.
       </p>
+      <IntegrationWalletBridge />
       {!user || route === "/signup" ? (
         <SignupPage />
       ) : route === "/borrow" ? (

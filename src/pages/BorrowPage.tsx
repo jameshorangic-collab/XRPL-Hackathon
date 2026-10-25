@@ -3,6 +3,7 @@ import { useApp } from "../components/AppContext";
 import { PageTitle, Badge, money } from "../components/ui";
 import UnderwritingPanel from "../components/UnderwritingPanel";
 import { exampleApplication } from "../data/marketSeed";
+import { bakeryApplication } from "../data/bakeryDemo";
 import type { ApplicationInput } from "../domain/marketTypes";
 import { navigate } from "../router";
 const blank: ApplicationInput = {
@@ -60,6 +61,9 @@ export default function BorrowPage() {
         <section className="panel">
           <div className="section-heading">
             <h2>Loan application</h2>
+            <button type="button" onClick={() => setForm(bakeryApplication)}>
+              Load Demo Bakery
+            </button>
             <button
               className="link-button"
               type="button"

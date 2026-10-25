@@ -5,7 +5,9 @@ export class NotConfiguredError extends Error {
   }
 }
 export function apiBase(): string {
-  const value = import.meta.env.VITE_API_BASE_URL?.trim() ?? "";
+  const value =
+    import.meta.env.VITE_API_BASE_URL?.trim() ??
+    (typeof window !== "undefined" ? window.location.origin : "");
   if (!value) return "";
   const url = new URL(value, window.location.origin);
   if (url.username || url.password || url.search || url.hash)
@@ -27,7 +29,10 @@ export async function requestJson<T>(
 ): Promise<T> {
   if (!base) throw new NotConfiguredError("Integration server");
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 15000);
+  const timer = setTimeout(
+    () => controller.abort(),
+    /underwriting\/assess|reports\/purchases/.test(path) ? 600000 : 15000,
+  );
   try {
     const r = await fetch(base + path, {
       ...init,

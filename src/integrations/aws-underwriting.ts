@@ -1,5 +1,11 @@
-import type { Application, Assessment } from "../domain/marketTypes";
+import type {
+  Application,
+  Assessment,
+  CashflowReport,
+  ReportPurchase,
+} from "../domain/marketTypes";
 import { assessDeterministically } from "../domain/underwriting";
+import { assessmentWithReport } from "../domain/cashflowReport";
 import { requestJson, NotConfiguredError } from "./server";
 export interface UnderwritingProvider {
   assess(application: Application, jobId: string): Promise<Assessment>;
@@ -20,6 +26,8 @@ export class AwsUnderwritingProvider implements UnderwritingProvider {
       invocationId: string;
       reasoning: string[];
       informationGaps: string[];
+      report?: CashflowReport;
+      reportPurchase?: ReportPurchase;
     }>(
       "/api/underwriting/assess",
       {
@@ -30,8 +38,10 @@ export class AwsUnderwritingProvider implements UnderwritingProvider {
       this.base,
     );
     if (
-      response.provider !== "aws-agentcore" ||
-      !response.invocationId ||
+      !["aws-agentcore", "aws-bedrock", "deterministic-demo"].includes(
+        response.provider,
+      ) ||
+      (response.provider !== "deterministic-demo" && !response.invocationId) ||
       !Array.isArray(response.reasoning) ||
       !response.reasoning.every((x) => typeof x === "string") ||
       !Array.isArray(response.informationGaps) ||
@@ -40,13 +50,52 @@ export class AwsUnderwritingProvider implements UnderwritingProvider {
       throw new Error(
         "AWS adapter returned an invalid explanation response. No assessment was published.",
       );
-    const facts = assessDeterministically(application);
+    const report = response.report;
+    if (
+      report &&
+      (report.source !== "BACKSTOP synthetic demonstration dataset" ||
+        ![
+          report.monthlyDeposits,
+          report.monthlyOutflows,
+          report.negativeBalanceDays,
+          report.months,
+        ].every((v) => Number.isSafeInteger(v) && v >= 0 && v <= 1000000000))
+    )
+      throw new Error("Invalid synthetic cashflow report.");
+    const facts = report
+      ? assessmentWithReport(application, report)
+      : assessDeterministically(application);
     return {
       ...facts,
-      provider: "aws-agentcore",
-      reasoning: response.reasoning,
+      provider: response.provider as Assessment["provider"],
+      reasoning: [
+        ...response.reasoning,
+        ...(report ? facts.reasoning.slice(-4) : []),
+      ],
       gaps: [...facts.gaps, ...response.informationGaps],
-      explanationSource: `AWS AgentCore explanation; invocation ${response.invocationId}. Financial facts and eligibility use deterministic rules.`,
+      reportPurchase: response.reportPurchase,
+      explanationSource:
+        response.provider === "deterministic-demo"
+          ? "Deterministic fallback; no AI invocation is claimed."
+          : `${response.provider === "aws-agentcore" ? "AWS AgentCore Harness" : "AWS Bedrock fallback"} explanation; invocation ${response.invocationId}. Financial facts and eligibility use deterministic demo rules.`,
     };
+  }
+}
+export class ResilientUnderwritingProvider implements UnderwritingProvider {
+  constructor(private base: string) {}
+  async assess(application: Application, jobId: string): Promise<Assessment> {
+    try {
+      return await new AwsUnderwritingProvider(this.base).assess(
+        application,
+        jobId,
+      );
+    } catch {
+      const facts = assessDeterministically(application);
+      return {
+        ...facts,
+        explanationSource:
+          "Integration backend unavailable. Deterministic demo fallback; no AI invocation or payment is claimed.",
+      };
+    }
   }
 }

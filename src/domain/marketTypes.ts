@@ -34,7 +34,9 @@ export type Recommendation = "eligible" | "needs_review" | "declined";
 export type Assessment = {
   id: string;
   applicationId: string;
-  provider: "deterministic-demo" | "aws-agentcore";
+  provider: "deterministic-demo" | "aws-agentcore" | "aws-bedrock";
+  cashflowReport?: CashflowReport;
+  reportPurchase?: ReportPurchase;
   recommendation: Recommendation;
   cashAvailable: Money;
   monthlyReserve: Money;
@@ -50,6 +52,16 @@ export type Assessment = {
   reasoning: string[];
   createdAt: string;
   explanationSource: string;
+};
+export type CashflowReport = {
+  source: "BACKSTOP synthetic demonstration dataset";
+  fixture: "consistent" | "discrepancy";
+  business: string;
+  monthlyDeposits: number;
+  monthlyOutflows: number;
+  negativeBalanceDays: number;
+  months: number;
+  recurringDebt: string;
 };
 export type Job = {
   id: string;
@@ -69,6 +81,11 @@ export type ReportState =
   | "Report received"
   | "Payment failed";
 export type ReportPurchase = {
+  channelId?: string;
+  amountRlusd?: string;
+  payoutHash?: string;
+  receiptUrl?: string;
+  settled?: boolean;
   applicationId: string;
   requestId: string;
   status: ReportState;
@@ -78,6 +95,7 @@ export type ReportPurchase = {
   paymentHash?: string;
 };
 export type LoanListing = {
+  portfolioId?: string;
   id: string;
   borrowerId: string;
   applicationId?: string;

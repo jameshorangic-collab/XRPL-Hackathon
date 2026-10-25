@@ -1,0 +1,56 @@
+{
+  "reasoning": [
+    "Application lacks a submitted financial report for comparison.",
+    "Deterministic facts include cash available and indicative annual cap, but no contractual rate is provided.",
+    "Cash reserve coverage is above the typical threshold; operating margin and debt-to-revenue ratios are strong.",
+    "The recommended eligibility aligns with deterministic facts, but the absence of a contractual rate requires disclosure.",
+    "An indicative annual cap of 1200 bps is provided for demo purposes; this is not a binding contract term.",
+    "Cashflow verification is recommended due to the missing report."
+  ],
+  "informationGaps": [
+    "No financial report submitted for comparison.",
+    "Contractual interest rate is missing; only an indicative cap is available.",
+    "Detailed cash flow breakdown is not provided.",
+    "Specific repayment alignment with cash reserves is unverified."
+  ],
+  "recommendedReports": [
+    "cashflow-verification"
+  ],
+  "requiresReview": true,
+  "provider": "aws-agentcore",
+  "invocationId": "e345f465-5cd5-479c-bd9c-bd67e2c3f753",
+  "sessionId": "50da9439-b43d-46f2-b086-4ad7769518f9",
+  "jobId": "bakery-verified-usd-001",
+  "startedAt": "2026-10-25T15:43:01.559Z",
+  "harnessArn": "arn:aws:bedrock-agentcore:us-east-2:141023342618:harness/harness_3gvmy-D1P2aCSQOX",
+  "region": "us-east-2",
+  "assessment": {
+    "id": "assessment-DEMO-BAKERY-001",
+    "applicationId": "DEMO-BAKERY-001",
+    "provider": "deterministic-demo",
+    "recommendation": "eligible",
+    "cashAvailable": 350000,
+    "monthlyReserve": 93334,
+    "dscr": 3.7499732144770395,
+    "operatingMarginBps": 2778,
+    "debtToRevenueBps": 833,
+    "indicativeRateBps": 1200,
+    "assumedPdBps": 300,
+    "assumedRecoveryBps": 4000,
+    "risk": "lower",
+    "indicators": [
+      "No threshold breach under the stated demo assumptions."
+    ],
+    "gaps": [
+      "Revenue, expenses, and debt are self-reported synthetic inputs.",
+      "Bank statements and credit history have not been verified."
+    ],
+    "reasoning": [
+      "The model reserves principal plus a simple annual coupon over 12 months for one maturity payment.",
+      "Marketplace eligibility requires positive cash, at least 1.25× reserve coverage, and one year of operations.",
+      "Preliminary outcome: eligible. Unverified information is disclosed and additional reports are not treated as purchased."
+    ],
+    "createdAt": "2026-10-25T15:43:01.559Z",
+    "explanationSource": "Deterministic demo rules; no AI model invoked."
+  }
+}
