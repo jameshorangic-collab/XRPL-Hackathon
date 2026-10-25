@@ -10,6 +10,7 @@ import { storageKey } from "./data/repository";
 import { createSeedState } from "./data/marketSeed";
 import IntegrationWalletBridge from "./components/IntegrationWalletBridge";
 import LiquidBackground from "./components/LiquidBackground";
+import Logo from "./components/Logo";
 class StartupBoundary extends Component<
   { children: ReactNode },
   { error: string }
@@ -83,9 +84,7 @@ function Application() {
             navigate(user ? "/dashboard" : "/signup");
           }}
         >
-          <span className="brand-mark" aria-hidden="true">
-            B
-          </span>
+          <Logo />
           Backstop
         </a>
         {user && (
