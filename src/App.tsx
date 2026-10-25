@@ -1,4 +1,4 @@
-import { Component, useEffect, type ReactNode } from "react";
+import { Component, useEffect, useRef, type ReactNode } from "react";
 import { AppProvider, useApp } from "./components/AppContext";
 import SignupPage from "./pages/SignupPage";
 import BorrowPage from "./pages/BorrowPage";
@@ -58,6 +58,21 @@ function Application() {
     else if (user && (route === "/" || route === null))
       navigate("/dashboard", true);
   }, [user, route]);
+  // Expose the sticky header's height so pinned page tabs sit just below it.
+  const header = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = header.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const sync = () =>
+      document.documentElement.style.setProperty(
+        "--header-h",
+        `${el.offsetHeight}px`,
+      );
+    const observer = new ResizeObserver(sync);
+    observer.observe(el);
+    sync();
+    return () => observer.disconnect();
+  }, []);
   const links: [Route, string][] = [
     ["/borrow", "Request Loan"],
     ["/invest", "Invest"],
@@ -66,7 +81,7 @@ function Application() {
   ];
   return (
     <>
-      <header className="app-header">
+      <header className="app-header" ref={header}>
         <a
           className="brand"
           href={user ? "/dashboard" : "/signup"}
@@ -131,8 +146,9 @@ function Application() {
       )}
       {user && (
         <p className="demo-banner">
-          Hackathon demo · synthetic applications and assessments · marketplace
-          funding is simulated · demo profiles are not secure authentication.
+          This is a hackathon demo. Every business, assessment, and balance is
+          synthetic, investments are simulated rather than sent on-chain, and
+          demo profiles are not secure accounts.
         </p>
       )}
       {!user || route === "/signup" ? (
@@ -145,7 +161,8 @@ function Application() {
         <DashboardPage />
       )}
       <footer>
-        BACKSTOP · Hackathon prototype · Browser data persists on this device
+        BACKSTOP is a hackathon prototype. Your demo data is saved only in this
+        browser.
       </footer>
     </>
   );

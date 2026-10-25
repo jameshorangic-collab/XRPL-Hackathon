@@ -129,8 +129,10 @@ export default function UnderwritingPanel({
               <span>Cash-reserve coverage</span>
               <strong>{assessment.dscr?.toFixed(2) ?? "—"}×</strong>
               <small>
-                vs. {money(assessment.monthlyReserve, true)}/mo repayment
-                reserve
+                Cash available divided by the{" "}
+                {money(assessment.monthlyReserve, true)} set aside each month to
+                repay principal and interest. The marketplace requires at least
+                1.25×.
               </small>
             </div>
             <div>
@@ -144,7 +146,10 @@ export default function UnderwritingPanel({
             <div>
               <span>Indicative coupon</span>
               <strong>{percent(assessment.indicativeRateBps)} / yr</strong>
-              <small>Annual simple rate ceiling; final cost set by bids</small>
+              <small>
+                The highest annual simple rate investors can earn on this loan.
+                The final cost is set by the bids investors submit.
+              </small>
             </div>
             <div>
               <span>Paid credit report</span>
@@ -162,10 +167,9 @@ export default function UnderwritingPanel({
             </div>
           </div>
           <p className="small muted">
-            Operating margin {percent(assessment.operatingMarginBps)} · existing
-            debt / revenue {percent(assessment.debtToRevenueBps)}. Principal and
-            coupon are due in one bullet payment; the monthly reserve is a
-            planning assumption.
+            Operating margin is {percent(assessment.operatingMarginBps)} and
+            existing debt payments are {percent(assessment.debtToRevenueBps)} of
+            revenue.
           </p>
           <h3>Risk factors</h3>
           <ul>

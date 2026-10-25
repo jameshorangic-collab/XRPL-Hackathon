@@ -201,7 +201,13 @@ export default function DashboardPage() {
           </p>
           <section className="panel">
             <div className="section-heading">
-              <h2>Your bids</h2>
+              <div>
+                <h2>Your bids</h2>
+                <p className="section-note">
+                  A bid reserves part of your balance until capital clearing
+                  selects it and you commit funding.
+                </p>
+              </div>
               <button className="primary" onClick={() => navigate("/invest")}>
                 Browse investments
               </button>
@@ -260,6 +266,11 @@ export default function DashboardPage() {
           </section>
           <section className="panel">
             <h2>Your committed investments</h2>
+            <p className="section-note">
+              Capital you have committed (simulated). Expected payments assume
+              the borrowers repay in full; returns are not guaranteed and losses
+              follow repayment priority.
+            </p>
             {commitments.length ? (
               <div className="table-scroll">
                 <table>
@@ -333,6 +344,10 @@ export default function DashboardPage() {
       )}
       <section className="panel">
         <h2>Transaction history</h2>
+        <p className="section-note">
+          Every movement of your simulated balance. Simulated activity never has
+          a blockchain transaction hash.
+        </p>
         {transactions.length ? (
           <div className="table-scroll">
             <table>

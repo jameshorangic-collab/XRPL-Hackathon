@@ -289,8 +289,9 @@ export default function InvestmentPanel({
             </label>
             {portfolio && (
               <p className="small muted">
-                Senior requires 20% subordinated enhancement and at most 80%
-                advance. Mezzanine requires 10% junior + retained enhancement.
+                Senior bids need at least 20% of the portfolio ranked beneath
+                them (mezzanine, junior, and originator capital) and can fund at
+                most 80% of it. Mezzanine bids need at least 10% beneath them.
               </p>
             )}
             {locked && (
@@ -505,8 +506,7 @@ export default function InvestmentPanel({
         {plan && !plan.result.feasible && (
           <p className="small">
             Eligible capital gap:{" "}
-            <strong>{money(plan.result.fundingGap)}</strong>. A zero gap still
-            requires pricing and risk constraints to be satisfied.
+            <strong>{money(plan.result.fundingGap)}</strong>.
           </p>
         )}
         {structure && <StructureTable structure={structure} />}

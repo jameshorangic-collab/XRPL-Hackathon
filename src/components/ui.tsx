@@ -146,8 +146,7 @@ export function StructureTable({
       <p className="small muted">
         Projected financing cost:{" "}
         <strong>{money(s.projectedCost, true)}</strong> over {s.termMonths}{" "}
-        months, including {money(s.fee, true)} projected fees. Principal is not
-        counted twice.
+        months, including {money(s.fee, true)} in projected fees.
       </p>
     </>
   );

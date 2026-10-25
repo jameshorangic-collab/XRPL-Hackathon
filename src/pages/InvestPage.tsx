@@ -132,7 +132,9 @@ export default function InvestPage() {
                           >
                             {l.loan.grade}
                           </Badge>
-                          <small>PD {percent(l.loan.pdBps)} assumed</small>
+                          <small>
+                            {percent(l.loan.pdBps)} assumed chance of default
+                          </small>
                         </div>
                       </td>
                       <td data-label="Funding">
@@ -208,8 +210,10 @@ export default function InvestPage() {
                     </p>
                   </div>
                   <p className="small muted">
-                    {p.terms.termMonths}-month bullet model · Senior / Mezzanine
-                    / Junior positions · originator retains first loss
+                    Repaid in a single payment after {p.terms.termMonths}{" "}
+                    months. Investors choose a senior, mezzanine, or junior
+                    position, and the originator keeps a first-loss stake that
+                    absorbs losses before any investor.
                   </p>
                   <FundingProgress state={state} id={p.id} />
                   <button className="primary" onClick={() => open(p.id)}>

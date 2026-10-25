@@ -94,9 +94,6 @@ export default function BorrowPage() {
           <div className="section-heading">
             <div>
               <h2 id="application-title">Loan application</h2>
-              <p className="small muted">
-                All fields are synthetic demo inputs.
-              </p>
             </div>
             <div className="button-row" style={{ margin: 0 }}>
               <button
@@ -118,6 +115,10 @@ export default function BorrowPage() {
           <form onSubmit={submit}>
             <div className="form-section">
               <h3>Business details</h3>
+              <p className="section-note">
+                Who the business is and how long it has operated. Operating
+                history affects eligibility.
+              </p>
               <div className="form-row">
                 <label>
                   Business name
@@ -171,6 +172,10 @@ export default function BorrowPage() {
             </div>
             <div className="form-section">
               <h3>Loan details</h3>
+              <p className="section-note">
+                How much you need, for how long, and what it pays for. Principal
+                and interest are repaid in one payment at the end of the term.
+              </p>
               <div className="form-row">
                 <label>
                   Requested amount (USD)
@@ -215,6 +220,10 @@ export default function BorrowPage() {
             </div>
             <div className="form-section">
               <h3>Financial information</h3>
+              <p className="section-note">
+                Average monthly figures. Underwriting uses them to estimate how
+                much cash remains each month to set aside for repayment.
+              </p>
               <div className="form-row three">
                 <label>
                   Revenue (USD/mo)

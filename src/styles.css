@@ -1,5 +1,5 @@
-/* Libre Franklin is the open fallback when Franklin Gothic is not installed. */
-@import url("https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700&display=swap");
+/* Open fallbacks: Cormorant Garamond for Perpetua titles, Libre Franklin for Franklin Gothic text. */
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Libre+Franklin:wght@400;600;700&display=swap");
 /* BACKSTOP design system — atmospheric blue palette (Pantone-inspired), classic ombre, rounded. */
 :root {
   --font-body:
@@ -2021,4 +2021,139 @@ textarea:focus {
 .tranche-card .tranche-figures b {
   font-family: var(--font-strong);
   font-weight: 400;
+}
+
+/* ============ Titles in Perpetua, aqua-gray details, pinned tabs ============ */
+:root {
+  --font-title: "Perpetua", "Cormorant Garamond", Garamond, Georgia, serif;
+  --font-titling:
+    "Perpetua Titling MT", "Perpetua", "Cormorant Garamond", Georgia, serif;
+  /* Pantone Aqua Gray family. */
+  --aqua: #a5b8b5;
+  --aqua-deep: #7d9794;
+  --aqua-soft: #e4ecea;
+  --border: #b4c6c4;
+  --border-strong: #8ea6a3;
+}
+
+/* Titles: Perpetua. Small text stays Franklin Gothic. */
+h1,
+h2,
+h3 {
+  font-family: var(--font-title);
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--ink);
+}
+h1,
+.signup-card h1 {
+  font-size: 38px;
+  line-height: 1.1;
+}
+h2 {
+  font-size: 23px;
+  line-height: 1.2;
+}
+h3 {
+  font-size: 19px;
+}
+.opportunity h2 {
+  font-size: 22px;
+}
+.investment-panel h2 {
+  font-size: 28px;
+}
+.application-row h3,
+.subsection > h3 {
+  font-size: 20px;
+}
+.brand {
+  font-family: var(--font-titling);
+  font-weight: 700;
+  font-size: 19px;
+  letter-spacing: 0.1em;
+}
+.section-note {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink);
+  margin-top: 4px;
+  max-width: 62ch;
+}
+.form-section > .section-note {
+  margin-top: -6px;
+}
+
+/* Aqua-gray details. */
+.app-header {
+  border-bottom: 3px solid var(--aqua);
+}
+.panel {
+  border-top: 3px solid var(--aqua);
+}
+.investment-panel {
+  border-top-color: var(--aqua-deep);
+}
+.stat {
+  border-left: 3px solid var(--aqua);
+}
+th {
+  background: var(--aqua-soft);
+  border-bottom: 2px solid var(--aqua);
+}
+td {
+  border-bottom-color: #d4dfdd;
+}
+.form-section,
+.subsection,
+.integration-box,
+.application-row,
+.application-select,
+footer {
+  border-top-color: var(--aqua);
+}
+.timeline li:not(:last-child):before,
+.timeline li.complete:not(:last-child):before {
+  background: var(--aqua);
+}
+.badge {
+  border-color: var(--aqua);
+}
+.assessment-summary,
+.integration-list {
+  border-color: var(--aqua);
+  background: var(--aqua);
+}
+.summary-card,
+.tranche-card,
+.role-card {
+  border-color: var(--aqua);
+}
+.tranche-card .tranche-figures {
+  border-top-color: var(--aqua);
+}
+.empty {
+  border-color: var(--aqua-deep);
+}
+.funding progress,
+.funding progress::-webkit-progress-bar {
+  background: var(--aqua-soft);
+}
+
+/* Marketplace tabs stay pinned under the sticky header while scrolling. */
+.app-header {
+  z-index: 10;
+}
+.tabs {
+  position: sticky;
+  top: calc(var(--header-h, 64px) + 10px);
+  z-index: 6;
+  background: #d3dfdd;
+  border-color: var(--aqua-deep);
+  box-shadow: 0 4px 14px rgba(10, 19, 32, 0.14);
+}
+.tabs {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
 }
